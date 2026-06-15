@@ -1,0 +1,92 @@
+{
+  "name": "edwson-design-system-components",
+  "version": "1.8.0",
+  "note": "Each component is a CONTRACT, not just markup. The metadata (whenToUse / whenNot / props / a11y / regulatory / dataContract) is what lets an AI agent pick and wire the right component on the first try — which is where the token savings come from (fewer correction loops, no value regeneration).",
+  "components": {
+    "OrderTicket": {
+      "purpose": "Place a buy/sell order with pre-trade margin + compliance checks.",
+      "whenToUse": "Any execution surface where a user submits an order.",
+      "whenNot": "Read-only blotters or historical fills — use TradeBlotter.",
+      "props": ["symbol", "side", "orderType", "quantity", "limitPrice", "tif"],
+      "a11y": "Keyboard-first; SEND is reversible with a visible cancel window; FIX OrdStatus drives state, not animation.",
+      "regulatory": ["ASIC RG 268 (risk warning required)", "FINRA 2111 (suitability gate)"],
+      "tokens": ["accent2", "green", "red", "radius.md", "space.4"],
+      "dataContract": { "shape": "{ symbol, bid, ask, marginImpact }", "states": ["loading", "empty", "error", "stale"] },
+      "requires": ["RiskWarning", "PriceTicker"]
+    },
+    "RiskWarning": {
+      "purpose": "Mandatory, non-removable risk disclosure before a high-risk action.",
+      "whenToUse": "Any leveraged/CFD order entry or product page that triggers a disclosure rule.",
+      "whenNot": "Never optional. Cannot be visually suppressed or collapsed below the fold.",
+      "props": ["jurisdiction", "productType", "afsl"],
+      "a11y": "Prominence-first hierarchy; not color-only; min 14px.",
+      "regulatory": ["ASIC RG 268", "ESMA leverage disclosure"],
+      "tokens": ["red", "radius.sm", "space.3"],
+      "dataContract": { "shape": "{ jurisdiction, computedText }", "states": ["loading", "error"] },
+      "nonRemovable": true
+    },
+    "PriceTicker": {
+      "purpose": "Live price with direction + tick animation.",
+      "whenToUse": "Any surface showing a streaming instrument price.",
+      "whenNot": "Static end-of-day reports — use a plain figure.",
+      "props": ["symbol", "precision"],
+      "a11y": "Deuteranopia-safe up/down encoding (arrow + color).",
+      "regulatory": [],
+      "tokens": ["green", "red", "type.mono"],
+      "dataContract": { "shape": "{ symbol, last, changePct, ts }", "states": ["loading", "empty", "error", "stale"] }
+    },
+    "KycStepper": {
+      "purpose": "Progressive multi-step KYC/AML onboarding with save-and-resume.",
+      "whenToUse": "Account onboarding, EDD, periodic re-verification.",
+      "whenNot": "Single-field edits — use a standard form.",
+      "props": ["steps", "current", "saveResume"],
+      "a11y": "One section at a time; clear progress; plain-language labels.",
+      "regulatory": ["FinCEN CDD 31 CFR 1010.230", "FATF Rec 10", "ASIC AML/CTF"],
+      "tokens": ["accent2", "surface", "border", "radius.md"],
+      "dataContract": { "shape": "{ steps[], current, savedAt }", "states": ["empty", "error"] },
+      "requires": ["RegCitation"]
+    },
+    "RegCitation": {
+      "purpose": "Inline legal basis shown beside an intrusive question.",
+      "whenToUse": "EDD / source-of-funds / suitability questions.",
+      "whenNot": "Decorative copy. Must reference a real rule.",
+      "props": ["rule", "summary"],
+      "a11y": "Readable, not fine-print; expandable detail.",
+      "regulatory": ["FinCEN CDD", "FATF Rec 10/12"],
+      "tokens": ["text3", "type.xs"],
+      "dataContract": { "shape": "{ rule, summary }", "states": [] }
+    },
+    "AiSuggestion": {
+      "purpose": "An AI recommendation that requires explicit human sign-off.",
+      "whenToUse": "Any AI-proposed action affecting a client portfolio/account.",
+      "whenNot": "Never auto-executes. Always pairs with SignOffBar.",
+      "props": ["title", "rationale", "evidence", "confidence"],
+      "a11y": "Confidence shown numerically + as a meter; reasoning attached.",
+      "regulatory": ["SR 11-7 (effective challenge)", "SEC 17a-4 (audit trail)"],
+      "tokens": ["gold", "accent2", "green", "radius.md"],
+      "dataContract": { "shape": "{ title, rationale, evidence[], confidence }", "states": ["loading", "error"] },
+      "requires": ["SignOffBar", "ConfidenceMeter"]
+    },
+    "SignOffBar": {
+      "purpose": "Typed human sign-off that gates execution and writes an audit record.",
+      "whenToUse": "Commit points for AI-assisted or high-impact actions.",
+      "whenNot": "Low-stakes UI. Do not stub the audit write.",
+      "props": ["proposalId", "signer"],
+      "a11y": "Explicit confirm; no default-yes.",
+      "regulatory": ["SEC 17a-4", "SR 11-7"],
+      "tokens": ["accent2", "accentFg", "radius.sm"],
+      "dataContract": { "shape": "{ proposalId, signer, signedAt, hash }", "states": ["error"] },
+      "blocksAutonomousExecution": true
+    },
+    "ConfidenceMeter": {
+      "purpose": "Calibrated confidence display with a designed-abstain state.",
+      "whenToUse": "Any surfaced model output.",
+      "whenNot": "Don't fake precision; show abstain when low.",
+      "props": ["value", "abstainThreshold"],
+      "a11y": "Numeric + visual; abstain is a first-class state.",
+      "regulatory": ["SR 11-7"],
+      "tokens": ["gold", "green", "red"],
+      "dataContract": { "shape": "{ value }", "states": ["empty"] }
+    }
+  }
+}

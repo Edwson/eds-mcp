@@ -1,0 +1,23 @@
+{
+  "name": "edwson-design-system",
+  "version": "1.8.0",
+  "generatedAt": "2026-06-15T03:18:30.466Z",
+  "summary": {
+    "tokens": 48,
+    "components": 8
+  },
+  "files": {
+    "tokens.json": {
+      "sha256": "4bce9b5b39f87041c9d21ff455e1a7eecfee6023c4b852566088f4a9f1f63311",
+      "bytes": 1868
+    },
+    "components.json": {
+      "sha256": "c36057066054f745c483e7b5f5442fcd2edccfd6f277db37458a67cc6383bc37",
+      "bytes": 5365
+    }
+  },
+  "sync": {
+    "strategy": "checksum-diff",
+    "note": "Consumers fetch only files whose sha256 differs from their cached copy."
+  }
+}
