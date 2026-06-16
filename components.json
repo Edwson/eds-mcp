@@ -1,6 +1,6 @@
 {
   "name": "edwson-design-system-components",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "note": "Each component is a CONTRACT, not just markup. The metadata (whenToUse / whenNot / props / a11y / regulatory / dataContract) is what lets an AI agent pick and wire the right component on the first try — which is where the token savings come from (fewer correction loops, no value regeneration).",
   "components": {
     "OrderTicket": {
@@ -1439,6 +1439,271 @@
         "states": []
       },
       "domain": "platform"
+    },
+    "PaymentRailSelector": {
+      "purpose": "Choose a money-movement rail (ACH, Wire, RTP, FedNow, SEPA, SWIFT) with live settlement speed, cost, cutoff, and reversibility.",
+      "whenToUse": "Any send-money flow where the rail materially changes speed, cost, or finality.",
+      "whenNot": "Single-rail products — show a static rail badge, not a chooser of one.",
+      "props": {
+        "rails": "string[]",
+        "amount": "number",
+        "currency": "string",
+        "selected": "string",
+        "urgency": "standard|same-day|instant"
+      },
+      "a11y": "Radiogroup semantics; each rail announces speed + cost + finality; the cutoff countdown is text, never color-only.",
+      "regulatory": [
+        "NACHA Operating Rules (ACH)",
+        "ISO 20022 (wire / RTP messaging)",
+        "Reg E 12 CFR 1005 (consumer EFT)"
+      ],
+      "tokens": [
+        "accent2",
+        "text1",
+        "text2",
+        "border",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ rail, etaSeconds, feeBps, cutoffTs, reversible }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "requires": [
+        "MoneyMovementTracker"
+      ],
+      "domain": "payments"
+    },
+    "MoneyMovementTracker": {
+      "purpose": "Show a payment's lifecycle — initiated, risk hold, clearing, settled or returned — with a reversibility window and return code.",
+      "whenToUse": "After a payment is submitted, on any status surface the payer or ops team sees.",
+      "whenNot": "Instant irreversible rails with no intermediate states — a single settled badge is honest; don't fake stages.",
+      "props": {
+        "paymentId": "string",
+        "status": "initiated|hold|clearing|settled|returned",
+        "rail": "string",
+        "returnCode": "string?",
+        "reversibleUntil": "number?"
+      },
+      "a11y": "Status is a live region; the stage list is an ordered list with aria-current; return codes link to plain-language explanations.",
+      "regulatory": [
+        "NACHA return codes (R01–R85)",
+        "Reg E error resolution (12 CFR 1005.11)",
+        "ISO 20022 pacs.002 (payment status report)"
+      ],
+      "tokens": [
+        "green",
+        "red",
+        "gold",
+        "text2",
+        "border",
+        "radius.md",
+        "space.3"
+      ],
+      "dataContract": {
+        "shape": "{ status, rail, returnCode, reversibleUntil }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "payments"
+    },
+    "FxQuoteTicket": {
+      "purpose": "Quote a cross-currency transfer: you-send / they-receive, indicative rate, fee, mid-market markup, and a rate-expiry timer.",
+      "whenToUse": "Any multi-currency send where rate and fee must be disclosed before commit.",
+      "whenNot": "Same-currency transfers — no FX surface, and never invent a rate.",
+      "props": {
+        "sendAmount": "number",
+        "fromCcy": "string",
+        "toCcy": "string",
+        "rate": "number",
+        "feeFixed": "number",
+        "markupBps": "number",
+        "quoteExpiresTs": "number"
+      },
+      "a11y": "Rate-expiry is counted-down text with aria-live; the markup over mid-market is stated explicitly, never hidden inside the rate.",
+      "regulatory": [
+        "Reg E remittance rule (12 CFR 1005 Subpart B)",
+        "Consumer FX transparency (mid-market disclosure)",
+        "PSD2 (EEA payment transparency)"
+      ],
+      "tokens": [
+        "accent",
+        "text1",
+        "text2",
+        "text3",
+        "border",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ rate, markupBps, feeFixed, quoteExpiresTs }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "payments"
+    },
+    "ReconciliationMatch": {
+      "purpose": "Match a bank or processor statement line against a ledger entry — matched, unmatched, or exception — with confidence and a manual-match action.",
+      "whenToUse": "Treasury, ops, or finance surfaces reconciling money movement to the ledger.",
+      "whenNot": "Real-time pre-trade checks — this is post-settlement reconciliation, not an execution gate.",
+      "props": {
+        "statementLine": "object",
+        "ledgerEntry": "object?",
+        "state": "matched|unmatched|exception",
+        "confidence": "number"
+      },
+      "a11y": "Match state carries a text label plus icon, never color alone; manual-match is keyboard-operable and reversible with an audit note.",
+      "regulatory": [
+        "SOC 1 / ICFR (reconciliation control)",
+        "ISO 20022 camt.053 (bank statement)",
+        "SEC 17a-4 (audit-trail retention where applicable)"
+      ],
+      "tokens": [
+        "green",
+        "gold",
+        "red",
+        "text2",
+        "surface2",
+        "border",
+        "radius.sm",
+        "space.3"
+      ],
+      "dataContract": {
+        "shape": "{ state, confidence, delta }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "payments"
+    },
+    "PaymentRetryDunning": {
+      "purpose": "Recover a failed payment: reason code, smart-retry schedule, and an update-payment-method path that reduces involuntary churn.",
+      "whenToUse": "Subscription or billing surfaces after a recurring charge fails.",
+      "whenNot": "One-time payments with no recurring relationship — a single error + retry is enough; no dunning ladder.",
+      "props": {
+        "reasonCode": "string",
+        "attempt": "number",
+        "maxAttempts": "number",
+        "nextRetryTs": "number",
+        "canUpdateMethod": "boolean"
+      },
+      "a11y": "The reason code is translated to plain language; the retry schedule is text; the update-method CTA is the primary action, not buried.",
+      "regulatory": [
+        "Reg E (consumer EFT)",
+        "Card-network retry rules (Visa / Mastercard)",
+        "PSD2 SCA (re-authentication on method update)"
+      ],
+      "tokens": [
+        "red",
+        "gold",
+        "accent2",
+        "text1",
+        "text2",
+        "border",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ reasonCode, attempt, nextRetryTs }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "payments"
+    },
+    "MandateConsent": {
+      "purpose": "Capture and display a debit authorization (ACH authorization / SEPA mandate): payee, amount cap, frequency, and a revocation path.",
+      "whenToUse": "Setting up any pull-based recurring debit where the payer must authorize in advance.",
+      "whenNot": "Push payments the user initiates each time — there is no standing mandate to capture.",
+      "props": {
+        "payee": "string",
+        "amountCap": "number?",
+        "frequency": "one-off|weekly|monthly|variable",
+        "mandateId": "string?",
+        "revocable": "boolean"
+      },
+      "a11y": "The authorization text is readable before consent; revoke is as easy to find as grant; consent state is announced.",
+      "regulatory": [
+        "NACHA authorization rules (WEB / PPD / CCD)",
+        "SEPA Direct Debit Mandate (Rulebook)",
+        "Reg E preauthorized transfers (12 CFR 1005.10)"
+      ],
+      "tokens": [
+        "accent2",
+        "text1",
+        "text2",
+        "border",
+        "border2",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ mandateId, frequency, amountCap, revocable }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "payments"
+    },
+    "PayoutSchedule": {
+      "purpose": "Show when funds land for a payee: available balance, in-transit, next payout date, and rolling-reserve hold.",
+      "whenToUse": "Marketplace or platform payout surfaces where sellers or contractors track money owed.",
+      "whenNot": "Instant-settlement contexts with no schedule — show a single balance, not a timeline.",
+      "props": {
+        "available": "number",
+        "inTransit": "number",
+        "nextPayoutTs": "number",
+        "reserveHeld": "number?",
+        "schedule": "daily|weekly|monthly"
+      },
+      "a11y": "Amounts are tabular-aligned with explicit currency; the next-payout date is text; reserve holds are explained, not just shown.",
+      "regulatory": [
+        "Money-transmission / payout licensing (state MTL where applicable)",
+        "IRS 1099-K reporting thresholds",
+        "Rolling-reserve disclosure"
+      ],
+      "tokens": [
+        "green",
+        "gold",
+        "text1",
+        "text2",
+        "text3",
+        "border",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ available, inTransit, nextPayoutTs, reserveHeld }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "payments"
     }
   }
 }

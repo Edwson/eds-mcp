@@ -76,6 +76,8 @@ ok(search('kyc').length >= 1, 'search "kyc" finds a component');
 ok(search('autonomy').includes('AutonomyTier'), 'search "autonomy" finds AutonomyTier');
 ok('accent2' in TOKENS.color.light && 'accent2' in TOKENS.color.dark, 'get_token "accent2" resolves in both themes');
 ok(Object.values(COMPONENTS).filter((c) => c.domain === 'data-eng').length >= 2, 'list_components domain=data-eng returns ≥2');
+ok(search('payment').length >= 1, 'search "payment" finds a component');
+ok(Object.values(COMPONENTS).filter((c) => c.domain === 'payments').length >= 5, 'list_components domain=payments returns ≥5');
 
 console.log(fails === 0 ? '\nPASS — contract is valid and in sync.' : `\nFAIL — ${fails} check(s) failed.`);
 process.exit(fails === 0 ? 0 : 1);

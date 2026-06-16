@@ -63,7 +63,7 @@ Every tool returns a text block **and** `structuredContent` (the same object, ma
 | `eds://components` | component index (id + purpose + domain + regulatory flags) |
 | `eds://manifest` | version + per-file checksums |
 
-48 component contracts span ten domains — `trading`, `compliance`, `ai`, `ml`, `ai-cost`, `data-eng`, `ai-infra`, `b2b`, `a11y`, `platform`.
+55 component contracts span eleven domains — `trading`, `compliance`, `payments`, `ai`, `ml`, `ai-cost`, `data-eng`, `ai-infra`, `b2b`, `a11y`, `platform`. The `payments` domain covers money movement end-to-end: rail selection, lifecycle tracking, FX quoting, reconciliation, dunning, debit mandates, and payout schedules — each carrying its NACHA / ISO 20022 / Reg E / SEPA / PSD2 anchor in the contract.
 
 ## Run
 
