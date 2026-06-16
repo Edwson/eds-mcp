@@ -1,18 +1,54 @@
 {
   "name": "eds-mcp-server",
-  "version": "1.8.0",
+  "version": "1.11.0",
   "description": "Edwson Design System over MCP — read-only token + component contract for AI agents. Auto-syncs across an org and cuts AI-token spend by serving targeted, reference-based, cache-friendly slices instead of pasted CSS/screenshots.",
   "type": "module",
-  "bin": { "eds-mcp-server": "server.js" },
+  "bin": {
+    "eds-mcp-server": "server.js"
+  },
   "scripts": {
     "start": "node server.js",
-    "build:manifest": "node build-manifest.js"
+    "build:manifest": "node build-manifest.js",
+    "test": "node test.js"
   },
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.23.0"
   },
   "license": "MIT",
-  "author": "Ed Chen"
+  "author": "Ed Chen",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "design-system",
+    "design-tokens",
+    "ai-agents",
+    "fintech",
+    "institutional-finance",
+    "regulated-platforms",
+    "ai-native",
+    "claude",
+    "cursor",
+    "codex"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Edwson/eds-mcp"
+  },
+  "homepage": "https://edwson.com/design-system-showcase.html#sec-ai-native-dev",
+  "bugs": {
+    "url": "https://github.com/Edwson/eds-mcp/issues"
+  },
+  "files": [
+    "server.js",
+    "build-manifest.js",
+    "tokens.json",
+    "components.json",
+    "manifest.json",
+    "test.js",
+    "README.md"
+  ]
 }

@@ -39,23 +39,40 @@ are marked non-removable, so neither a human in a hurry nor an agent can ship th
 
 ---
 
-## Tools (all read-only)
+## Tools (9, all read-only)
+
+Every tool returns a text block **and** `structuredContent` (the same object, machine-parseable); errors set `isError: true` instead of masquerading as data.
 
 | Tool | Returns |
 |---|---|
 | `list_token_groups` | group names only (cheapest orientation) |
 | `get_tokens {group, theme?}` | only the requested token group |
+| `get_token {name, theme?}` | resolve one token by name across groups (theme-aware) |
 | `search_components {query}` | matching ids + one-line purpose |
+| `list_components {domain?}` | every component id + purpose + domain, optionally filtered |
 | `get_component {id}` | one component's full contract |
 | `get_data_contract {id}` | data shape + required render states |
 | `get_manifest` | version + per-file checksums |
 | `diff_since {version}` | changed files since a version (auto-sync delta) |
 
+### Resources (whole-file, read-only)
+
+| URI | Contents |
+|---|---|
+| `eds://tokens` | full token contract |
+| `eds://components` | component index (id + purpose + domain + regulatory flags) |
+| `eds://manifest` | version + per-file checksums |
+
+14 component contracts span six domains — `trading`, `compliance`, `ai`, `ai-cost`, `data-eng`, `ai-infra`.
+
 ## Run
 
 ```bash
+git clone https://github.com/Edwson/eds-mcp
+cd eds-mcp
 npm install
 npm run build:manifest   # regenerate manifest.json after any token/component change
+npm test                 # validate the contract + manifest sync (no SDK needed)
 npm start                # speaks MCP over stdio
 ```
 
@@ -74,6 +91,7 @@ Requires Node 18+. The contract lives in `tokens.json` + `components.json`; edit
 tokens.json        token contract (color light/dark, space, radius, type, density)
 components.json    component contracts (purpose, when-to-use/not, props, a11y, regulatory, dataContract)
 build-manifest.js  auto-sync engine — hashes contracts -> manifest.json
-server.js          MCP server — read-only tools over stdio
+server.js          MCP server — 9 read-only tools + 3 resources over stdio
+test.js            dependency-free smoke test (contract shape + manifest sync)
 manifest.json      generated — version + SHA-256 per file
 ```

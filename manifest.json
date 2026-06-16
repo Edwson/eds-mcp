@@ -1,19 +1,43 @@
 {
   "name": "edwson-design-system",
-  "version": "1.8.0",
-  "generatedAt": "2026-06-15T03:18:30.466Z",
+  "version": "1.11.0",
+  "generatedAt": "2026-06-16T03:14:21.260Z",
   "summary": {
     "tokens": 48,
-    "components": 8
+    "components": 14,
+    "domains": [
+      "ai",
+      "ai-cost",
+      "ai-infra",
+      "compliance",
+      "data-eng",
+      "trading"
+    ],
+    "componentIds": [
+      "OrderTicket",
+      "RiskWarning",
+      "PriceTicker",
+      "KycStepper",
+      "RegCitation",
+      "AiSuggestion",
+      "SignOffBar",
+      "ConfidenceMeter",
+      "AutonomyTier",
+      "TokenCostMeter",
+      "SchemaContract",
+      "LineageGraph",
+      "ClusterTopology",
+      "AuditTrail"
+    ]
   },
   "files": {
     "tokens.json": {
-      "sha256": "4bce9b5b39f87041c9d21ff455e1a7eecfee6023c4b852566088f4a9f1f63311",
-      "bytes": 1868
+      "sha256": "9265612391e0b7fb75bbf692a1a817d705fc1bb3749b4aa6d0f346611e0984eb",
+      "bytes": 2027
     },
     "components.json": {
-      "sha256": "c36057066054f745c483e7b5f5442fcd2edccfd6f277db37458a67cc6383bc37",
-      "bytes": 5365
+      "sha256": "c77ed416897ddbd60cc49b6574f451bb2210b848e9025b464659fc0d1e5ded98",
+      "bytes": 13087
     }
   },
   "sync": {

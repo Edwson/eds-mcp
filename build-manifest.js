@@ -44,12 +44,14 @@ tokenCount =
 
 const components = JSON.parse(readFileSync(join(here, 'components.json'), 'utf8'));
 const componentCount = Object.keys(components.components || {}).length;
+const componentIds = Object.keys(components.components || {});
+const domains = [...new Set(Object.values(components.components || {}).map((c) => c.domain).filter(Boolean))].sort();
 
 const manifest = {
   name: 'edwson-design-system',
   version,
   generatedAt: new Date().toISOString(),
-  summary: { tokens: tokenCount, components: componentCount },
+  summary: { tokens: tokenCount, components: componentCount, domains, componentIds },
   files,
   sync: {
     strategy: 'checksum-diff',

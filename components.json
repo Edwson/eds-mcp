@@ -1,92 +1,430 @@
 {
   "name": "edwson-design-system-components",
-  "version": "1.8.0",
+  "version": "1.11.0",
   "note": "Each component is a CONTRACT, not just markup. The metadata (whenToUse / whenNot / props / a11y / regulatory / dataContract) is what lets an AI agent pick and wire the right component on the first try — which is where the token savings come from (fewer correction loops, no value regeneration).",
   "components": {
     "OrderTicket": {
       "purpose": "Place a buy/sell order with pre-trade margin + compliance checks.",
       "whenToUse": "Any execution surface where a user submits an order.",
       "whenNot": "Read-only blotters or historical fills — use TradeBlotter.",
-      "props": ["symbol", "side", "orderType", "quantity", "limitPrice", "tif"],
+      "props": [
+        "symbol",
+        "side",
+        "orderType",
+        "quantity",
+        "limitPrice",
+        "tif"
+      ],
       "a11y": "Keyboard-first; SEND is reversible with a visible cancel window; FIX OrdStatus drives state, not animation.",
-      "regulatory": ["ASIC RG 268 (risk warning required)", "FINRA 2111 (suitability gate)"],
-      "tokens": ["accent2", "green", "red", "radius.md", "space.4"],
-      "dataContract": { "shape": "{ symbol, bid, ask, marginImpact }", "states": ["loading", "empty", "error", "stale"] },
-      "requires": ["RiskWarning", "PriceTicker"]
+      "regulatory": [
+        "ASIC RG 268 (risk warning required)",
+        "FINRA 2111 (suitability gate)"
+      ],
+      "tokens": [
+        "accent2",
+        "green",
+        "red",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ symbol, bid, ask, marginImpact }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "requires": [
+        "RiskWarning",
+        "PriceTicker"
+      ],
+      "domain": "trading"
     },
     "RiskWarning": {
       "purpose": "Mandatory, non-removable risk disclosure before a high-risk action.",
       "whenToUse": "Any leveraged/CFD order entry or product page that triggers a disclosure rule.",
       "whenNot": "Never optional. Cannot be visually suppressed or collapsed below the fold.",
-      "props": ["jurisdiction", "productType", "afsl"],
+      "props": [
+        "jurisdiction",
+        "productType",
+        "afsl"
+      ],
       "a11y": "Prominence-first hierarchy; not color-only; min 14px.",
-      "regulatory": ["ASIC RG 268", "ESMA leverage disclosure"],
-      "tokens": ["red", "radius.sm", "space.3"],
-      "dataContract": { "shape": "{ jurisdiction, computedText }", "states": ["loading", "error"] },
-      "nonRemovable": true
+      "regulatory": [
+        "ASIC RG 268",
+        "ESMA leverage disclosure"
+      ],
+      "tokens": [
+        "red",
+        "radius.sm",
+        "space.3"
+      ],
+      "dataContract": {
+        "shape": "{ jurisdiction, computedText }",
+        "states": [
+          "loading",
+          "error"
+        ]
+      },
+      "nonRemovable": true,
+      "domain": "compliance"
     },
     "PriceTicker": {
       "purpose": "Live price with direction + tick animation.",
       "whenToUse": "Any surface showing a streaming instrument price.",
       "whenNot": "Static end-of-day reports — use a plain figure.",
-      "props": ["symbol", "precision"],
+      "props": [
+        "symbol",
+        "precision"
+      ],
       "a11y": "Deuteranopia-safe up/down encoding (arrow + color).",
       "regulatory": [],
-      "tokens": ["green", "red", "type.mono"],
-      "dataContract": { "shape": "{ symbol, last, changePct, ts }", "states": ["loading", "empty", "error", "stale"] }
+      "tokens": [
+        "green",
+        "red",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ symbol, last, changePct, ts }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "trading"
     },
     "KycStepper": {
       "purpose": "Progressive multi-step KYC/AML onboarding with save-and-resume.",
       "whenToUse": "Account onboarding, EDD, periodic re-verification.",
       "whenNot": "Single-field edits — use a standard form.",
-      "props": ["steps", "current", "saveResume"],
+      "props": [
+        "steps",
+        "current",
+        "saveResume"
+      ],
       "a11y": "One section at a time; clear progress; plain-language labels.",
-      "regulatory": ["FinCEN CDD 31 CFR 1010.230", "FATF Rec 10", "ASIC AML/CTF"],
-      "tokens": ["accent2", "surface", "border", "radius.md"],
-      "dataContract": { "shape": "{ steps[], current, savedAt }", "states": ["empty", "error"] },
-      "requires": ["RegCitation"]
+      "regulatory": [
+        "FinCEN CDD 31 CFR 1010.230",
+        "FATF Rec 10",
+        "ASIC AML/CTF"
+      ],
+      "tokens": [
+        "accent2",
+        "surface",
+        "border",
+        "radius.md"
+      ],
+      "dataContract": {
+        "shape": "{ steps[], current, savedAt }",
+        "states": [
+          "empty",
+          "error"
+        ]
+      },
+      "requires": [
+        "RegCitation"
+      ],
+      "domain": "compliance"
     },
     "RegCitation": {
       "purpose": "Inline legal basis shown beside an intrusive question.",
       "whenToUse": "EDD / source-of-funds / suitability questions.",
       "whenNot": "Decorative copy. Must reference a real rule.",
-      "props": ["rule", "summary"],
+      "props": [
+        "rule",
+        "summary"
+      ],
       "a11y": "Readable, not fine-print; expandable detail.",
-      "regulatory": ["FinCEN CDD", "FATF Rec 10/12"],
-      "tokens": ["text3", "type.xs"],
-      "dataContract": { "shape": "{ rule, summary }", "states": [] }
+      "regulatory": [
+        "FinCEN CDD",
+        "FATF Rec 10/12"
+      ],
+      "tokens": [
+        "text3",
+        "type.xs"
+      ],
+      "dataContract": {
+        "shape": "{ rule, summary }",
+        "states": []
+      },
+      "domain": "compliance"
     },
     "AiSuggestion": {
       "purpose": "An AI recommendation that requires explicit human sign-off.",
       "whenToUse": "Any AI-proposed action affecting a client portfolio/account.",
       "whenNot": "Never auto-executes. Always pairs with SignOffBar.",
-      "props": ["title", "rationale", "evidence", "confidence"],
+      "props": [
+        "title",
+        "rationale",
+        "evidence",
+        "confidence"
+      ],
       "a11y": "Confidence shown numerically + as a meter; reasoning attached.",
-      "regulatory": ["SR 11-7 (effective challenge)", "SEC 17a-4 (audit trail)"],
-      "tokens": ["gold", "accent2", "green", "radius.md"],
-      "dataContract": { "shape": "{ title, rationale, evidence[], confidence }", "states": ["loading", "error"] },
-      "requires": ["SignOffBar", "ConfidenceMeter"]
+      "regulatory": [
+        "SR 11-7 (effective challenge)",
+        "SEC 17a-4 (audit trail)"
+      ],
+      "tokens": [
+        "gold",
+        "accent2",
+        "green",
+        "radius.md"
+      ],
+      "dataContract": {
+        "shape": "{ title, rationale, evidence[], confidence }",
+        "states": [
+          "loading",
+          "error"
+        ]
+      },
+      "requires": [
+        "SignOffBar",
+        "ConfidenceMeter"
+      ],
+      "domain": "ai"
     },
     "SignOffBar": {
       "purpose": "Typed human sign-off that gates execution and writes an audit record.",
       "whenToUse": "Commit points for AI-assisted or high-impact actions.",
       "whenNot": "Low-stakes UI. Do not stub the audit write.",
-      "props": ["proposalId", "signer"],
+      "props": [
+        "proposalId",
+        "signer"
+      ],
       "a11y": "Explicit confirm; no default-yes.",
-      "regulatory": ["SEC 17a-4", "SR 11-7"],
-      "tokens": ["accent2", "accentFg", "radius.sm"],
-      "dataContract": { "shape": "{ proposalId, signer, signedAt, hash }", "states": ["error"] },
-      "blocksAutonomousExecution": true
+      "regulatory": [
+        "SEC 17a-4",
+        "SR 11-7"
+      ],
+      "tokens": [
+        "accent2",
+        "accentFg",
+        "radius.sm"
+      ],
+      "dataContract": {
+        "shape": "{ proposalId, signer, signedAt, hash }",
+        "states": [
+          "error"
+        ]
+      },
+      "blocksAutonomousExecution": true,
+      "domain": "ai"
     },
     "ConfidenceMeter": {
       "purpose": "Calibrated confidence display with a designed-abstain state.",
       "whenToUse": "Any surfaced model output.",
       "whenNot": "Don't fake precision; show abstain when low.",
-      "props": ["value", "abstainThreshold"],
+      "props": [
+        "value",
+        "abstainThreshold"
+      ],
       "a11y": "Numeric + visual; abstain is a first-class state.",
-      "regulatory": ["SR 11-7"],
-      "tokens": ["gold", "green", "red"],
-      "dataContract": { "shape": "{ value }", "states": ["empty"] }
+      "regulatory": [
+        "SR 11-7"
+      ],
+      "tokens": [
+        "gold",
+        "green",
+        "red"
+      ],
+      "dataContract": {
+        "shape": "{ value }",
+        "states": [
+          "empty"
+        ]
+      },
+      "domain": "ai"
+    },
+    "AutonomyTier": {
+      "domain": "ai",
+      "purpose": "Select an AI autonomy level (Ambient → Co-pilot → Assertive → Autonomous); raising a tier requires explicit re-consent.",
+      "whenToUse": "Anywhere an agent can act with varying independence and the user must own the boundary.",
+      "whenNot": "Never default to the highest tier; never let a tier change without an explicit, logged user action.",
+      "props": {
+        "tier": "ambient|copilot|assertive|autonomous",
+        "onChange": "fn",
+        "locked": "bool"
+      },
+      "a11y": "Radiogroup semantics; the active tier is announced; tier names carry meaning, not colour alone.",
+      "regulatory": [
+        "SR 11-7",
+        "EU AI Act Art. 14 (human oversight)"
+      ],
+      "tokens": [
+        "accent2",
+        "border",
+        "text1",
+        "text2",
+        "gold"
+      ],
+      "dataContract": {
+        "shape": "{ tier, allowedActions[], requiresReconsent }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "requires": [
+        "SignOffBar"
+      ]
+    },
+    "TokenCostMeter": {
+      "domain": "ai-cost",
+      "purpose": "Estimate the AI-token cost of a call (input/output tokens × model price) including prompt-cache savings.",
+      "whenToUse": "Surfacing the cost of an AI action before or while it runs, or budgeting an agent workflow.",
+      "whenNot": "Never present an estimate as a billed amount; always label it as an estimate.",
+      "props": {
+        "inputTokens": "number",
+        "outputTokens": "number",
+        "priceIn": "number",
+        "priceOut": "number",
+        "cachedPct": "number"
+      },
+      "a11y": "A live region announces the total; figures use tabular numerals to avoid reflow.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "text1",
+        "accent2",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ inputTokens, outputTokens, priceIn, priceOut, total, perThousand }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      }
+    },
+    "SchemaContract": {
+      "domain": "data-eng",
+      "purpose": "Define a table's columns (name/type/nullable) and emit a live CREATE TABLE DDL — the data contract engineering ships.",
+      "whenToUse": "Authoring a schema-on-write table or data contract collaboratively before a single row is written.",
+      "whenNot": "Not for schema-on-read exploratory CSVs; use type inference there.",
+      "props": {
+        "columns": "[{ name, type, nullable }]",
+        "tableName": "string"
+      },
+      "a11y": "Each column is a labelled fieldset; type is a native select; remove buttons carry aria-labels.",
+      "regulatory": [
+        "GDPR (data minimisation via typed / NOT NULL constraints)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "text1",
+        "accent2",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ tableName, columns[] }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      }
+    },
+    "LineageGraph": {
+      "domain": "data-eng",
+      "purpose": "Source → transform → table provenance as a clickable DAG with upstream/downstream impact tracing.",
+      "whenToUse": "Impact analysis before a schema change, or root-cause when a downstream report goes stale.",
+      "whenNot": "For hundreds of nodes use a dedicated lineage catalog; this is a focused single-pipeline view.",
+      "props": {
+        "nodes": "[{ id, kind, name, to[] }]"
+      },
+      "a11y": "Nodes are buttons, keyboard-activatable; relationship encoded in the node border, not colour alone; selection announced.",
+      "regulatory": [
+        "GDPR / data-residency audit (provenance)"
+      ],
+      "tokens": [
+        "surface2",
+        "border",
+        "accent2",
+        "gold",
+        "green"
+      ],
+      "dataContract": {
+        "shape": "{ nodes[], edges[] }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      }
+    },
+    "ClusterTopology": {
+      "domain": "ai-infra",
+      "purpose": "Pooled unified-memory AI cluster topology with a human visual and a machine-readable manifest (EXO-style).",
+      "whenToUse": "Planning or showing an on-prem distributed-inference cluster and which model fits in pooled memory.",
+      "whenNot": "Never equate pooled unified memory with single-GPU VRAM; always label memory figures as estimates.",
+      "props": {
+        "nodes": "[{ id, device, unifiedMemGb, role }]",
+        "interconnect": "string"
+      },
+      "a11y": "Node cards are labelled; the pooled total sits in a live region; the manifest is a labelled code region.",
+      "regulatory": [
+        "Data residency (on-prem inference)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "accent2",
+        "gold",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ nodes[], pooledMemGb, interconnect, endpoints[] }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      }
+    },
+    "AuditTrail": {
+      "domain": "compliance",
+      "purpose": "Append-only, hash-chained event log for compliance evidence (sign-offs, overrides, disclosures shown).",
+      "whenToUse": "Any action that must be defensible later: human sign-off, AI override, KYC step, disclosure acknowledgement.",
+      "whenNot": "Never allow edit or delete of past entries; never omit the actor or the timestamp.",
+      "props": {
+        "entries": "[{ ts, actor, action, hash }]",
+        "append": "fn"
+      },
+      "a11y": "The log is a labelled list; new entries are announced politely; timestamps are machine-readable.",
+      "regulatory": [
+        "SEC Rule 17a-4(f) (append-only retention)",
+        "SR 11-7"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "text2",
+        "type.mono",
+        "green"
+      ],
+      "dataContract": {
+        "shape": "{ entries[], sealed }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "nonRemovable": true
     }
   }
 }
