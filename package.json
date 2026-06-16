@@ -1,6 +1,6 @@
 {
   "name": "eds-mcp-server",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "Edwson Design System over MCP — read-only token + component contract for AI agents. Auto-syncs across an org and cuts AI-token spend by serving targeted, reference-based, cache-friendly slices instead of pasted CSS/screenshots.",
   "type": "module",
   "bin": {

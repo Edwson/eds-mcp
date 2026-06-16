@@ -63,7 +63,7 @@ Every tool returns a text block **and** `structuredContent` (the same object, ma
 | `eds://components` | component index (id + purpose + domain + regulatory flags) |
 | `eds://manifest` | version + per-file checksums |
 
-14 component contracts span six domains — `trading`, `compliance`, `ai`, `ai-cost`, `data-eng`, `ai-infra`.
+48 component contracts span ten domains — `trading`, `compliance`, `ai`, `ml`, `ai-cost`, `data-eng`, `ai-infra`, `b2b`, `a11y`, `platform`.
 
 ## Run
 

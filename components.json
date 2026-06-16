@@ -1,20 +1,20 @@
 {
   "name": "edwson-design-system-components",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "note": "Each component is a CONTRACT, not just markup. The metadata (whenToUse / whenNot / props / a11y / regulatory / dataContract) is what lets an AI agent pick and wire the right component on the first try — which is where the token savings come from (fewer correction loops, no value regeneration).",
   "components": {
     "OrderTicket": {
       "purpose": "Place a buy/sell order with pre-trade margin + compliance checks.",
       "whenToUse": "Any execution surface where a user submits an order.",
       "whenNot": "Read-only blotters or historical fills — use TradeBlotter.",
-      "props": [
-        "symbol",
-        "side",
-        "orderType",
-        "quantity",
-        "limitPrice",
-        "tif"
-      ],
+      "props": {
+        "symbol": "string",
+        "side": "buy|sell",
+        "orderType": "market|limit|stop",
+        "quantity": "number",
+        "limitPrice": "number?",
+        "tif": "GTC|IOC|FOK|DAY"
+      },
       "a11y": "Keyboard-first; SEND is reversible with a visible cancel window; FIX OrdStatus drives state, not animation.",
       "regulatory": [
         "ASIC RG 268 (risk warning required)",
@@ -46,11 +46,11 @@
       "purpose": "Mandatory, non-removable risk disclosure before a high-risk action.",
       "whenToUse": "Any leveraged/CFD order entry or product page that triggers a disclosure rule.",
       "whenNot": "Never optional. Cannot be visually suppressed or collapsed below the fold.",
-      "props": [
-        "jurisdiction",
-        "productType",
-        "afsl"
-      ],
+      "props": {
+        "jurisdiction": "ISO country/region",
+        "productType": "CFD|FX|equity",
+        "afsl": "string (AFSL no.)"
+      },
       "a11y": "Prominence-first hierarchy; not color-only; min 14px.",
       "regulatory": [
         "ASIC RG 268",
@@ -75,10 +75,10 @@
       "purpose": "Live price with direction + tick animation.",
       "whenToUse": "Any surface showing a streaming instrument price.",
       "whenNot": "Static end-of-day reports — use a plain figure.",
-      "props": [
-        "symbol",
-        "precision"
-      ],
+      "props": {
+        "symbol": "string",
+        "precision": "number"
+      },
       "a11y": "Deuteranopia-safe up/down encoding (arrow + color).",
       "regulatory": [],
       "tokens": [
@@ -101,11 +101,11 @@
       "purpose": "Progressive multi-step KYC/AML onboarding with save-and-resume.",
       "whenToUse": "Account onboarding, EDD, periodic re-verification.",
       "whenNot": "Single-field edits — use a standard form.",
-      "props": [
-        "steps",
-        "current",
-        "saveResume"
-      ],
+      "props": {
+        "steps": "Step[]",
+        "current": "number",
+        "saveResume": "bool"
+      },
       "a11y": "One section at a time; clear progress; plain-language labels.",
       "regulatory": [
         "FinCEN CDD 31 CFR 1010.230",
@@ -134,10 +134,10 @@
       "purpose": "Inline legal basis shown beside an intrusive question.",
       "whenToUse": "EDD / source-of-funds / suitability questions.",
       "whenNot": "Decorative copy. Must reference a real rule.",
-      "props": [
-        "rule",
-        "summary"
-      ],
+      "props": {
+        "rule": "string (citation id)",
+        "summary": "string"
+      },
       "a11y": "Readable, not fine-print; expandable detail.",
       "regulatory": [
         "FinCEN CDD",
@@ -157,12 +157,12 @@
       "purpose": "An AI recommendation that requires explicit human sign-off.",
       "whenToUse": "Any AI-proposed action affecting a client portfolio/account.",
       "whenNot": "Never auto-executes. Always pairs with SignOffBar.",
-      "props": [
-        "title",
-        "rationale",
-        "evidence",
-        "confidence"
-      ],
+      "props": {
+        "title": "string",
+        "rationale": "string",
+        "evidence": "Source[]",
+        "confidence": "number 0-1"
+      },
       "a11y": "Confidence shown numerically + as a meter; reasoning attached.",
       "regulatory": [
         "SR 11-7 (effective challenge)",
@@ -191,10 +191,10 @@
       "purpose": "Typed human sign-off that gates execution and writes an audit record.",
       "whenToUse": "Commit points for AI-assisted or high-impact actions.",
       "whenNot": "Low-stakes UI. Do not stub the audit write.",
-      "props": [
-        "proposalId",
-        "signer"
-      ],
+      "props": {
+        "proposalId": "string",
+        "signer": "string (typed name)"
+      },
       "a11y": "Explicit confirm; no default-yes.",
       "regulatory": [
         "SEC 17a-4",
@@ -218,10 +218,10 @@
       "purpose": "Calibrated confidence display with a designed-abstain state.",
       "whenToUse": "Any surfaced model output.",
       "whenNot": "Don't fake precision; show abstain when low.",
-      "props": [
-        "value",
-        "abstainThreshold"
-      ],
+      "props": {
+        "value": "number 0-1",
+        "abstainThreshold": "number 0-1"
+      },
       "a11y": "Numeric + visual; abstain is a first-class state.",
       "regulatory": [
         "SR 11-7"
@@ -425,6 +425,1020 @@
         ]
       },
       "nonRemovable": true
+    },
+    "OrderBook": {
+      "purpose": "Render a Level 2 bid/ask depth ladder with aggressor highlighting and microsecond time-priority ordering.",
+      "whenToUse": "On execution and market-microstructure surfaces where depth, queue position, and time priority drive the trade decision.",
+      "whenNot": "Not for a single top-of-book quote — use PriceTicker instead.",
+      "props": {
+        "symbol": "string ticker",
+        "depth": "number of levels per side",
+        "highlightAggressor": "bool",
+        "tickSize": "number price increment"
+      },
+      "a11y": "Ladder rows are a semantic table with row/column headers; bid/ask are distinguished by label and position, not colour alone.",
+      "regulatory": [
+        "MiFID II RTS 27 (execution quality)",
+        "Reg NMS Rule 611"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "green",
+        "red",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ bids[], asks[], lastUpdateNanos }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "trading"
+    },
+    "RiskMatrix": {
+      "purpose": "Visualise portfolio concentration and risk exposure as a heatmap with an automatic throttle gate when limits are breached.",
+      "whenToUse": "On risk-management surfaces where concentration must be seen at a glance and breaches must hard-stop new exposure.",
+      "whenNot": "Not for a single position's P&L — use a position card; not for narrative risk reporting.",
+      "props": {
+        "buckets": "concentration grid data",
+        "throttleThreshold": "number breach limit",
+        "onThrottle": "fn",
+        "gated": "bool"
+      },
+      "a11y": "Heatmap cells carry text values and an explicit breach status; the throttle gate is announced via live region.",
+      "regulatory": [
+        "SR 11-7",
+        "Basel III concentration limits"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "red",
+        "gold",
+        "text2"
+      ],
+      "dataContract": {
+        "shape": "{ cells[], maxConcentration, throttled }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "trading",
+      "blocksAutonomousExecution": true
+    },
+    "MarginPanel": {
+      "purpose": "Show margin, leverage and available buying power with jurisdiction-specific leverage caps applied.",
+      "whenToUse": "Anywhere a user takes leveraged exposure and the regulated cap must be enforced and visible.",
+      "whenNot": "Not for cash-only accounts with no leverage — omit the panel.",
+      "props": {
+        "jurisdiction": "string regulatory region",
+        "leverage": "number current ratio",
+        "equity": "number account equity",
+        "capOverride": "bool admin-only"
+      },
+      "a11y": "Leverage cap and current ratio are read as labelled values; an over-cap state is announced, not colour-only.",
+      "regulatory": [
+        "ASIC RG 227",
+        "ESMA leverage limits (CFD)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "text1",
+        "red",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ leverage, cap, marginUsed, buyingPower }",
+        "states": [
+          "loading",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "trading"
+    },
+    "TradeBlotter": {
+      "purpose": "Display an execution blotter keyed on FIX Tag 39 OrdStatus and Tag 150 ExecType with a CSDR settlement-penalty column.",
+      "whenToUse": "On post-trade surfaces tracking order lifecycle, fills and settlement exposure.",
+      "whenNot": "Not for submitting orders — use OrderTicket; not for live depth — use OrderBook.",
+      "props": {
+        "rows": "execution records",
+        "showPenaltyColumn": "bool",
+        "sortBy": "string column key",
+        "onSelect": "fn"
+      },
+      "a11y": "Rendered as a sortable data table with column headers and scope; OrdStatus is text, not a colour swatch.",
+      "regulatory": [
+        "FIX 4.4 (Tag 39 OrdStatus, Tag 150 ExecType)",
+        "CSDR Article 7 (settlement penalties)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "text2",
+        "gold",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ rows[], ordStatus, execType, penaltyAccrued }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "trading"
+    },
+    "SanctionsScreen": {
+      "purpose": "Screen a party against OFAC and PEP lists and surface scored potential matches for analyst review.",
+      "whenToUse": "During onboarding or transaction monitoring wherever a counterparty must be sanctions-screened.",
+      "whenNot": "Not a substitute for full KYC identity capture — use KycStepper for that.",
+      "props": {
+        "subject": "party to screen",
+        "matches": "scored hit list",
+        "threshold": "number match score cutoff",
+        "onEscalate": "fn"
+      },
+      "a11y": "Each match exposes its score and list source as text; clear/hit states announced via live region.",
+      "regulatory": [
+        "OFAC 31 CFR Part 501",
+        "FATF Rec 6 (targeted financial sanctions)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "red",
+        "gold",
+        "text2"
+      ],
+      "dataContract": {
+        "shape": "{ matches[], score, listSource, cleared }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "compliance",
+      "blocksAutonomousExecution": true
+    },
+    "SuitabilityGate": {
+      "purpose": "Gate access to a financial product behind a FINRA 2111 suitability assessment before the product is shown.",
+      "whenToUse": "Before exposing any product whose suitability depends on the customer's profile.",
+      "whenNot": "Not for products with no suitability obligation — render the product directly.",
+      "props": {
+        "profile": "customer suitability profile",
+        "product": "product under evaluation",
+        "onPass": "fn",
+        "onBlock": "fn"
+      },
+      "a11y": "Gate outcome is announced; the blocking reason is text and focusable, not a colour state.",
+      "regulatory": [
+        "FINRA Rule 2111 (suitability)",
+        "SEC Reg BI"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "text1",
+        "red",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ profile, suitable, reason }",
+        "states": [
+          "loading",
+          "error"
+        ]
+      },
+      "domain": "compliance",
+      "blocksAutonomousExecution": true
+    },
+    "DisclosureModal": {
+      "purpose": "Present a jurisdiction-routed disclosure per ASIC RG 268 with a meaningful-engagement gate before continuing.",
+      "whenToUse": "Whenever a regulated risk disclosure must be shown and genuine engagement evidenced before action.",
+      "whenNot": "Not for incidental tooltips or marketing copy — use a plain modal or tooltip.",
+      "props": {
+        "jurisdiction": "string routing key",
+        "minEngagementMs": "number dwell requirement",
+        "onAcknowledge": "fn",
+        "scrolled": "bool"
+      },
+      "a11y": "Focus is trapped, restored on close, and the acknowledge control is disabled until the engagement gate is met, announced via live region.",
+      "regulatory": [
+        "ASIC RG 268 (design and distribution)",
+        "MiFID II Art. 24 (information to clients)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "accent2",
+        "text1",
+        "radius.lg"
+      ],
+      "dataContract": {
+        "shape": "{ jurisdiction, body, engagementMs, acknowledged }",
+        "states": [
+          "loading",
+          "error"
+        ]
+      },
+      "domain": "compliance",
+      "requires": [
+        "FocusTrap"
+      ]
+    },
+    "UboGraph": {
+      "purpose": "Render an ultimate-beneficial-owner ownership graph for AML diligence under FATF Recommendation 10.",
+      "whenToUse": "During enhanced due diligence to trace control and ownership through layered legal entities.",
+      "whenNot": "Not for a flat counterparty list — use a table; not for transaction flow — use a different graph.",
+      "props": {
+        "rootEntity": "subject entity id",
+        "nodes": "entity nodes",
+        "edges": "ownership edges with percentages",
+        "controlThreshold": "number UBO percent"
+      },
+      "a11y": "Graph offers an equivalent navigable node list; ownership percentages and control status are read as text.",
+      "regulatory": [
+        "FATF Rec 10 (CDD)",
+        "FinCEN CDD Rule 31 CFR 1010.230"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "accent2",
+        "text2",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ nodes[], edges[], uboCandidates[] }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "compliance"
+    },
+    "ReasoningChain": {
+      "purpose": "Show an AI's step-by-step reasoning as a challengeable chain with each step labelled estimate vs fact.",
+      "whenToUse": "Wherever an AI conclusion must be auditable and the user can dispute individual steps.",
+      "whenNot": "Not for hiding chain-of-thought you don't want exposed — omit rather than fabricate steps.",
+      "props": {
+        "steps": "ordered reasoning steps",
+        "onChallenge": "fn",
+        "showLabels": "bool estimate/fact"
+      },
+      "a11y": "Steps form an ordered list; estimate/fact labels are text, and each step is individually focusable and challengeable.",
+      "regulatory": [
+        "EU AI Act Art. 13 (transparency)",
+        "SR 11-7"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "text1",
+        "text2",
+        "gold"
+      ],
+      "dataContract": {
+        "shape": "{ steps[], label, challenged }",
+        "states": [
+          "loading",
+          "empty",
+          "error"
+        ]
+      },
+      "domain": "ai"
+    },
+    "GroundingIndicator": {
+      "purpose": "Annotate AI claims at the claim level as grounded, ungrounded, or contradicted, blocking send when any claim is contradicted.",
+      "whenToUse": "On AI output surfaces where claims must be traceable to sources before the user can act on them.",
+      "whenNot": "Not for free-form creative text where grounding does not apply.",
+      "props": {
+        "claims": "per-claim grounding status",
+        "onBlockSend": "fn",
+        "sources": "supporting source refs"
+      },
+      "a11y": "Each claim's grounding state is announced as text; a contradicted claim moves focus to the blocking control.",
+      "regulatory": [
+        "EU AI Act Art. 50 (transparency)"
+      ],
+      "tokens": [
+        "surface",
+        "green",
+        "red",
+        "gold",
+        "text2"
+      ],
+      "dataContract": {
+        "shape": "{ claims[], status, sources[] }",
+        "states": [
+          "loading",
+          "empty",
+          "error"
+        ]
+      },
+      "domain": "ai",
+      "blocksAutonomousExecution": true
+    },
+    "AgentTrace": {
+      "purpose": "Trace an agent's tool calls with arguments, results and latency, gating write actions behind an explicit approval boundary.",
+      "whenToUse": "Whenever an agent invokes tools and the user must inspect and approve side-effecting actions.",
+      "whenNot": "Not for read-only chat with no tool use.",
+      "props": {
+        "spans": "tool-call trace records",
+        "onApproveWrite": "fn",
+        "writeBoundary": "bool gate enabled"
+      },
+      "a11y": "Trace is a structured list with labelled tool, args, result and latency; pending write approval is announced.",
+      "regulatory": [
+        "EU AI Act Art. 14 (human oversight)",
+        "SR 11-7"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "text2",
+        "accent2",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ spans[], tool, args, result, latencyMs, pendingApproval }",
+        "states": [
+          "loading",
+          "empty",
+          "error"
+        ]
+      },
+      "domain": "ai",
+      "blocksAutonomousExecution": true
+    },
+    "PromptComposer": {
+      "purpose": "Compose a prompt with attachable context chips, a live token budget, and injection-safe paste handling.",
+      "whenToUse": "Any input surface where users build prompts with context and must respect a token budget.",
+      "whenNot": "Not for a plain single-line search box — use a standard input.",
+      "props": {
+        "contextChips": "attached context items",
+        "tokenBudget": "number max tokens",
+        "onSubmit": "fn",
+        "sanitizePaste": "bool"
+      },
+      "a11y": "Chips are removable focusable elements; remaining token budget is announced via live region as it changes.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "accent2",
+        "text2",
+        "radius.md"
+      ],
+      "dataContract": {
+        "shape": "{ text, chips[], tokensUsed, tokenBudget }",
+        "states": [
+          "error"
+        ]
+      },
+      "domain": "ai"
+    },
+    "DisclosureLabel": {
+      "purpose": "Render an EU AI Act Article 50 label declaring content as AI-assisted or fully automated.",
+      "whenToUse": "On any surface presenting AI-generated or AI-assisted output that requires disclosure.",
+      "whenNot": "Not for purely human-authored content — no label is required.",
+      "props": {
+        "mode": "assisted|automated",
+        "reviewer": "string named human reviewer",
+        "compact": "bool"
+      },
+      "a11y": "The label is a text role element conveying assisted vs automated state without relying on an icon alone.",
+      "regulatory": [
+        "EU AI Act Art. 50 (transparency obligations)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "gold",
+        "text2",
+        "type.xs"
+      ],
+      "dataContract": {
+        "shape": "{ mode, reviewer }",
+        "states": []
+      },
+      "domain": "ai"
+    },
+    "ModelFallbackChain": {
+      "purpose": "Show an ordered model fallback chain and honestly flag when a reduced-quality model served the response.",
+      "whenToUse": "Where multiple models back a single feature and the user should know which one actually answered.",
+      "whenNot": "Not for single-model deployments with no fallback.",
+      "props": {
+        "chain": "ordered model list",
+        "activeModel": "string served model id",
+        "degraded": "bool reduced quality"
+      },
+      "a11y": "Active model and any degraded state are announced as text; chain order is a readable ordered list.",
+      "regulatory": [
+        "EU AI Act Art. 50 (transparency)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "text2",
+        "gold",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ chain[], activeModel, degraded }",
+        "states": [
+          "loading",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "ai"
+    },
+    "ModelCard": {
+      "purpose": "Present a model card with intended use, metrics and an explicit do-not-use panel.",
+      "whenToUse": "Wherever a deployed model must document its scope, limitations and prohibited uses.",
+      "whenNot": "Not for documenting a heuristic rule with no model — use plain docs.",
+      "props": {
+        "model": "model metadata",
+        "metrics": "evaluation metrics",
+        "doNotUse": "prohibited-use list"
+      },
+      "a11y": "Sections use proper heading structure; the do-not-use panel is a landmark region, not styled-only emphasis.",
+      "regulatory": [
+        "SR 11-7",
+        "EU AI Act Art. 11 (technical documentation)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "text1",
+        "red",
+        "space.5"
+      ],
+      "dataContract": {
+        "shape": "{ model, metrics, intendedUse, doNotUse[] }",
+        "states": [
+          "loading",
+          "error"
+        ]
+      },
+      "domain": "ml"
+    },
+    "ConfusionMatrix": {
+      "purpose": "Render a confusion matrix framing false negatives as missed risk and false positives as analyst cost.",
+      "whenToUse": "When evaluating a classifier whose error trade-offs carry distinct business consequences.",
+      "whenNot": "Not for regression model evaluation — use a residual or error plot.",
+      "props": {
+        "matrix": "2x2 or NxN counts",
+        "businessFraming": "bool FN/FP labels",
+        "onCellSelect": "fn"
+      },
+      "a11y": "Matrix is a data table with axis headers; FN and FP business meanings are text labels, not colour-coded only.",
+      "regulatory": [
+        "SR 11-7"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "green",
+        "red",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ tp, fp, fn, tn, falseNegativeCost }",
+        "states": [
+          "loading",
+          "empty",
+          "error"
+        ]
+      },
+      "domain": "ml"
+    },
+    "DriftMonitor": {
+      "purpose": "Monitor feature/prediction drift using PSI bands with honest acknowledgement of label-delay uncertainty.",
+      "whenToUse": "On model-monitoring surfaces tracking distribution shift over time.",
+      "whenNot": "Not for one-off model evaluation — use ConfusionMatrix or ModelCard.",
+      "props": {
+        "psiSeries": "PSI over time",
+        "bands": "stable/warn/drift thresholds",
+        "labelDelayDays": "number ground-truth lag"
+      },
+      "a11y": "Drift band state is announced as text; the label-delay caveat is a visible, readable note.",
+      "regulatory": [
+        "SR 11-7"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "gold",
+        "red",
+        "text2"
+      ],
+      "dataContract": {
+        "shape": "{ psiSeries[], band, labelDelayDays }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "ml"
+    },
+    "ChampionChallenger": {
+      "purpose": "Compare a champion and challenger model and block promotion when the challenger regresses on fairness.",
+      "whenToUse": "During model promotion reviews where a fairness regression must hard-stop deployment.",
+      "whenNot": "Not for routine A/B copy tests with no model governance.",
+      "props": {
+        "champion": "incumbent model metrics",
+        "challenger": "candidate model metrics",
+        "onPromote": "fn",
+        "fairnessGate": "bool"
+      },
+      "a11y": "Promotion eligibility and any fairness block are announced as text; metric deltas are labelled, not colour-only.",
+      "regulatory": [
+        "SR 11-7",
+        "EU AI Act Art. 10 (data governance)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "green",
+        "red",
+        "text2"
+      ],
+      "dataContract": {
+        "shape": "{ champion, challenger, fairnessDelta, promotionBlocked }",
+        "states": [
+          "loading",
+          "error"
+        ]
+      },
+      "domain": "ml",
+      "blocksAutonomousExecution": true
+    },
+    "TokenizerEstimate": {
+      "purpose": "Estimate a token-count range for input text without a live tokenizer call.",
+      "whenToUse": "When a user needs a quick token-cost estimate before sending text to a model.",
+      "whenNot": "Not where exact billed token counts are required — use the provider's tokenizer.",
+      "props": {
+        "text": "string input",
+        "model": "string tokenizer family",
+        "onEstimate": "fn"
+      },
+      "a11y": "The estimated range is announced via live region as the text changes; range bounds are text.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "text2",
+        "type.mono",
+        "space.3"
+      ],
+      "dataContract": {
+        "shape": "{ text, tokenLow, tokenHigh }",
+        "states": [
+          "error"
+        ]
+      },
+      "domain": "ai-cost"
+    },
+    "ContextWindowBudget": {
+      "purpose": "Show used versus remaining context-window tokens with an overflow warning at capacity.",
+      "whenToUse": "On any surface where the running conversation or document can exceed the model's context window.",
+      "whenNot": "Not for billing totals across requests — use UsagePricing.",
+      "props": {
+        "used": "number tokens used",
+        "windowSize": "number max context",
+        "onOverflow": "fn"
+      },
+      "a11y": "Remaining budget and overflow state are announced via live region, not signalled by colour alone.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "green",
+        "red",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ used, windowSize, remaining, overflow }",
+        "states": [
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "ai-cost"
+    },
+    "QualityProfiler": {
+      "purpose": "Profile each column's null-rate and distinct-count and surface a PASS or WARN data-quality verdict.",
+      "whenToUse": "When inspecting a dataset's health before it feeds a model or report.",
+      "whenNot": "Not for row-level record editing — use TypedQueryGrid.",
+      "props": {
+        "columns": "per-column profile stats",
+        "warnThresholds": "null/distinct limits",
+        "onColumnSelect": "fn"
+      },
+      "a11y": "Profile is a data table; PASS/WARN verdicts are text labels with scope headers, not colour-only.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "green",
+        "gold",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ columns[], nullRate, distinct, verdict }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "data-eng"
+    },
+    "TypedQueryGrid": {
+      "purpose": "Display query results in a grid with per-column type chips and type-aware sorting.",
+      "whenToUse": "When showing tabular query output where column types should drive correct sort behaviour.",
+      "whenNot": "Not for column-level statistical profiling — use QualityProfiler.",
+      "props": {
+        "rows": "result rows",
+        "schema": "column types",
+        "sortBy": "string column",
+        "sortDir": "asc|desc"
+      },
+      "a11y": "Grid is a data table with sortable column headers exposing aria-sort; type chips are text labels.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "text2",
+        "accent2",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ rows[], schema[], sortBy, sortDir }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "data-eng"
+    },
+    "DeltaVersionDiff": {
+      "purpose": "Diff two table versions showing rows added, changed and removed using Delta Lake time-travel.",
+      "whenToUse": "When comparing snapshots of a versioned table to audit what changed between commits.",
+      "whenNot": "Not for diffing free-form text — use a text diff component.",
+      "props": {
+        "fromVersion": "number base snapshot",
+        "toVersion": "number target snapshot",
+        "diff": "added/changed/removed rows"
+      },
+      "a11y": "Change categories are text-labelled with counts; diff rows are a navigable table, not colour-only highlights.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "green",
+        "red",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ fromVersion, toVersion, added[], changed[], removed[] }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "data-eng"
+    },
+    "ModelFitPartition": {
+      "purpose": "Check whether a model fits a cluster and compute a memory-weighted partition across nodes.",
+      "whenToUse": "When planning to load a large model and distribution across heterogeneous node memory is required.",
+      "whenNot": "Not for single-node inference where the model fits in one device — skip partitioning.",
+      "props": {
+        "modelSize": "number params or bytes",
+        "nodes": "cluster nodes with memory",
+        "quantization": "string quant scheme",
+        "onPartition": "fn"
+      },
+      "a11y": "Fit verdict and per-node share are read as labelled text values; an over-capacity state is announced.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "text2",
+        "gold",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ modelSize, nodes[], fits, partition[] }",
+        "states": [
+          "loading",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "ai-infra"
+    },
+    "DistributedInference": {
+      "purpose": "Run ring-based distributed inference exposed through an OpenAI/Claude/Ollama-compatible endpoint.",
+      "whenToUse": "When serving a model sharded across a node ring behind a standard inference API.",
+      "whenNot": "Not for single-process local inference — call the model directly.",
+      "props": {
+        "ring": "ordered node ring",
+        "endpoint": "string API base url",
+        "apiFlavor": "openai|claude|ollama",
+        "onStream": "fn"
+      },
+      "a11y": "Streaming state, active node and tokens/sec are announced via live region as text.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "accent2",
+        "text2",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ ring[], endpoint, tokensPerSec, streaming }",
+        "states": [
+          "loading",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "ai-infra"
+    },
+    "UsagePricing": {
+      "purpose": "Meter usage-based consumption and map it to pricing tiers with a running cost total.",
+      "whenToUse": "On billing surfaces where charges accrue per unit of usage across tiered plans.",
+      "whenNot": "Not for flat-rate subscriptions with no metering — show a static plan card.",
+      "props": {
+        "usage": "metered usage records",
+        "tiers": "pricing tier definitions",
+        "currency": "string ISO code"
+      },
+      "a11y": "Tier boundaries and running total are labelled text; the active tier is announced when it changes.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "text1",
+        "accent2",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ usage[], tiers[], total, currency }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "b2b"
+    },
+    "QuotaRateLimit": {
+      "purpose": "Provide a console for quota allocation and rate-limit configuration with live consumption readouts.",
+      "whenToUse": "On admin surfaces where tenants' quotas and request rate limits are set and monitored.",
+      "whenNot": "Not for end-user usage display — use UsagePricing.",
+      "props": {
+        "quota": "allocated quota",
+        "rateLimit": "requests-per-window config",
+        "consumed": "number used",
+        "onUpdate": "fn"
+      },
+      "a11y": "Consumption against quota is announced via live region; near-limit state is text, not colour-only.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "gold",
+        "red",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ quota, consumed, rateLimit, remaining }",
+        "states": [
+          "loading",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "b2b"
+    },
+    "SsoScimConsole": {
+      "purpose": "Configure enterprise SSO and SCIM provisioning, including identity-provider mapping and sync status.",
+      "whenToUse": "On enterprise admin surfaces managing single sign-on and automated user provisioning.",
+      "whenNot": "Not for individual password or profile settings — use a user account form.",
+      "props": {
+        "idp": "identity provider config",
+        "scimEnabled": "bool",
+        "mappings": "attribute mappings",
+        "onSync": "fn"
+      },
+      "a11y": "Connection and last-sync status are announced as text; mapping rows are a labelled table.",
+      "regulatory": [
+        "SOC 2 (access control)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "text1",
+        "green",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ idp, scimEnabled, mappings[], lastSync }",
+        "states": [
+          "loading",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "b2b"
+    },
+    "CustomerHealth": {
+      "purpose": "Compute a customer health score from usage and engagement signals and flag churn risk.",
+      "whenToUse": "On account-management surfaces surfacing at-risk customers for proactive outreach.",
+      "whenNot": "Not for raw event analytics — use a metrics dashboard.",
+      "props": {
+        "signals": "engagement/usage inputs",
+        "score": "number health score",
+        "churnRisk": "low|medium|high",
+        "onSelect": "fn"
+      },
+      "a11y": "Health score and churn-risk tier are announced as labelled text, not colour-only badges.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "green",
+        "red",
+        "text2"
+      ],
+      "dataContract": {
+        "shape": "{ signals[], score, churnRisk }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "domain": "b2b"
+    },
+    "ContrastChecker": {
+      "purpose": "Compute the WCAG relative-luminance contrast ratio between two colours and grade AA/AAA pass/fail.",
+      "whenToUse": "When validating colour pairs against WCAG contrast thresholds during design or QA.",
+      "whenNot": "Not for non-text decorative colour choices with no contrast requirement.",
+      "props": {
+        "foreground": "string colour",
+        "background": "string colour",
+        "textSize": "normal|large",
+        "onResult": "fn"
+      },
+      "a11y": "The computed ratio and AA/AAA verdicts are announced via live region as text, not signalled by colour alone.",
+      "regulatory": [
+        "WCAG 2.1 SC 1.4.3 (contrast minimum)",
+        "WCAG 2.1 SC 1.4.6 (contrast enhanced)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "green",
+        "red",
+        "type.mono"
+      ],
+      "dataContract": {
+        "shape": "{ foreground, background, ratio, passesAA, passesAAA }",
+        "states": [
+          "error"
+        ]
+      },
+      "domain": "a11y"
+    },
+    "FocusTrap": {
+      "purpose": "Trap keyboard focus within a modal region and restore focus to the trigger on close.",
+      "whenToUse": "Around any modal, dialog or drawer that must contain focus while open.",
+      "whenNot": "Not for inline non-modal content where focus should flow naturally past it.",
+      "props": {
+        "active": "bool trap enabled",
+        "initialFocus": "ref first focusable",
+        "onEscape": "fn",
+        "returnFocusTo": "ref trigger element"
+      },
+      "a11y": "Tab and Shift+Tab cycle within the region, Escape closes, and focus returns to the triggering element on close.",
+      "regulatory": [
+        "WCAG 2.1 SC 2.4.3 (focus order)",
+        "WCAG 2.1 SC 2.1.2 (no keyboard trap)"
+      ],
+      "tokens": [
+        "surface",
+        "border",
+        "accent2",
+        "radius.lg",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ active, focusables[] }",
+        "states": []
+      },
+      "domain": "a11y"
+    },
+    "LiveRegion": {
+      "purpose": "Announce dynamic content to screen readers via a polite or assertive ARIA live region.",
+      "whenToUse": "Whenever status, errors or results update without a page change and must be announced.",
+      "whenNot": "Not for static content already in the accessibility tree — announce only changes.",
+      "props": {
+        "politeness": "polite|assertive",
+        "message": "string to announce",
+        "clearAfterMs": "number auto-clear"
+      },
+      "a11y": "Implements an aria-live region with the chosen politeness; messages are text-only with no colour dependence.",
+      "regulatory": [
+        "WCAG 2.1 SC 4.1.3 (status messages)"
+      ],
+      "tokens": [
+        "text1",
+        "type.sm",
+        "space.2"
+      ],
+      "dataContract": {
+        "shape": "{ politeness, message }",
+        "states": []
+      },
+      "domain": "a11y"
+    },
+    "CrossPlatformWindow": {
+      "purpose": "Render OS-adaptive window chrome matching macOS, Windows, Linux or Ubuntu conventions.",
+      "whenToUse": "When emulating native window controls and layout that must feel correct per operating system.",
+      "whenNot": "Not for browser-engine differences — use CrossBrowserShell.",
+      "props": {
+        "os": "macos|windows|linux|ubuntu",
+        "title": "string window title",
+        "controlsPosition": "left|right",
+        "onClose": "fn"
+      },
+      "a11y": "Window controls expose accessible names regardless of OS styling; layout differences do not change focus order.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "surface2",
+        "border",
+        "text2",
+        "radius.md"
+      ],
+      "dataContract": {
+        "shape": "{ os, controlsPosition }",
+        "states": []
+      },
+      "domain": "platform"
+    },
+    "CrossBrowserShell": {
+      "purpose": "Provide engine-aware rendering via @supports feature queries with graceful fallbacks for Blink, Gecko and WebKit.",
+      "whenToUse": "When a feature must degrade predictably across rendering engines using progressive enhancement.",
+      "whenNot": "Not for OS-level window chrome — use CrossPlatformWindow; never UA-sniff for engine detection.",
+      "props": {
+        "feature": "string css feature query",
+        "fallback": "node degraded render",
+        "enhanced": "node enhanced render"
+      },
+      "a11y": "Both the enhanced and fallback paths expose the same semantics and focus order; engine differences are invisible to assistive tech.",
+      "regulatory": [],
+      "tokens": [
+        "surface",
+        "border",
+        "text2",
+        "accent2",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ feature, supported }",
+        "states": []
+      },
+      "domain": "platform"
     }
   }
 }

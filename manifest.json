@@ -1,16 +1,20 @@
 {
   "name": "edwson-design-system",
-  "version": "1.11.0",
-  "generatedAt": "2026-06-16T03:14:21.260Z",
+  "version": "1.12.0",
+  "generatedAt": "2026-06-16T03:26:21.559Z",
   "summary": {
     "tokens": 48,
-    "components": 14,
+    "components": 48,
     "domains": [
+      "a11y",
       "ai",
       "ai-cost",
       "ai-infra",
+      "b2b",
       "compliance",
       "data-eng",
+      "ml",
+      "platform",
       "trading"
     ],
     "componentIds": [
@@ -27,17 +31,51 @@
       "SchemaContract",
       "LineageGraph",
       "ClusterTopology",
-      "AuditTrail"
+      "AuditTrail",
+      "OrderBook",
+      "RiskMatrix",
+      "MarginPanel",
+      "TradeBlotter",
+      "SanctionsScreen",
+      "SuitabilityGate",
+      "DisclosureModal",
+      "UboGraph",
+      "ReasoningChain",
+      "GroundingIndicator",
+      "AgentTrace",
+      "PromptComposer",
+      "DisclosureLabel",
+      "ModelFallbackChain",
+      "ModelCard",
+      "ConfusionMatrix",
+      "DriftMonitor",
+      "ChampionChallenger",
+      "TokenizerEstimate",
+      "ContextWindowBudget",
+      "QualityProfiler",
+      "TypedQueryGrid",
+      "DeltaVersionDiff",
+      "ModelFitPartition",
+      "DistributedInference",
+      "UsagePricing",
+      "QuotaRateLimit",
+      "SsoScimConsole",
+      "CustomerHealth",
+      "ContrastChecker",
+      "FocusTrap",
+      "LiveRegion",
+      "CrossPlatformWindow",
+      "CrossBrowserShell"
     ]
   },
   "files": {
     "tokens.json": {
-      "sha256": "9265612391e0b7fb75bbf692a1a817d705fc1bb3749b4aa6d0f346611e0984eb",
+      "sha256": "b269cdcbe52a178aef15674abd30014967affa4362a27333bd8cae65b71261f5",
       "bytes": 2027
     },
     "components.json": {
-      "sha256": "c77ed416897ddbd60cc49b6574f451bb2210b848e9025b464659fc0d1e5ded98",
-      "bytes": 13087
+      "sha256": "cfdb13d45a4afd904bb841f64a82f9e7078d58aeeacac2103e8ecb8669176cf1",
+      "bytes": 48334
     }
   },
   "sync": {

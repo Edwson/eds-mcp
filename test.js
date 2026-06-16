@@ -54,6 +54,7 @@ for (const [id, c] of Object.entries(COMPONENTS)) {
   const missing = REQUIRED.filter((f) => !(f in c));
   ok(missing.length === 0, id + ' has full contract' + (missing.length ? ' — MISSING: ' + missing.join(', ') : ''));
   ok(Array.isArray(c.regulatory) && Array.isArray(c.tokens), id + ' regulatory + tokens are arrays');
+  ok(c.props && typeof c.props === 'object' && !Array.isArray(c.props), id + ' props is an object (name -> type)');
   const st = (c.dataContract && c.dataContract.states) || [];
   ok(Array.isArray(st) && st.every((s) => CANON.includes(s)), id + ' dataContract states are valid (' + (st.join(', ') || 'none') + ')');
   ok((c.tokens || []).every(tokenKnown), id + ' references only known tokens (' + c.tokens.join(', ') + ')');
