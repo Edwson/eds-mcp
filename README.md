@@ -1,22 +1,55 @@
-# eds-mcp-server — the Edwson Design System over MCP
+# eds-mcp — the Edwson Design System over MCP + HTTP
 
 [![CI](https://github.com/Edwson/eds-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Edwson/eds-mcp/actions/workflows/ci.yml)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-3c873a)
-![MCP](https://img.shields.io/badge/MCP-server%20%2B%20library-6e56cf)
+![MCP](https://img.shields.io/badge/MCP-server-6e56cf)
+![HTTP API](https://img.shields.io/badge/HTTP-REST%20%2B%20OpenAPI-22d3ee)
+![Library](https://img.shields.io/badge/library-zero%20deps-3c873a)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-A [Model Context Protocol](https://modelcontextprotocol.io) server **and** a pure JavaScript library
-that hands your design-system **token + component contract** to any AI agent (Claude Code, Codex,
-Cursor, …) — not just to *read*, but to **scaffold correct code, lint a proposed usage, discover
-components by the regulation they serve, and export the theme**. One source of truth, auto-synced
-across the org, with your **AI-token bill going down instead of up**.
+Your design-system **token + component contract**, served three ways from one engine — to **AI agents**
+(Model Context Protocol), to **any app** (a zero-dependency HTTP REST API with an OpenAPI spec), and to
+**Node code** (import the pure library). Not just to *read*, but to **scaffold correct code, lint a
+proposed usage, discover components by the regulation they serve, and export the theme** — one source of
+truth, auto-synced across the org, with your **AI-token bill going down instead of up**.
 
 This is the runnable backbone behind the "AI-Native Development" section of the
 [design system showcase](https://edwson.com/design-system-showcase.html).
 
 ```
-18 tools   ·   5 resources   ·   3 prompts   ·   55 component contracts across 11 domains
-reads + code-generation + linting + regulation-aware discovery + theme export
+MCP: 18 tools · 5 resources · 3 prompts     HTTP: 19 REST endpoints · OpenAPI 3.1     Library: createCore()
+55 component contracts across 11 domains · reads + code-generation + linting + regulation-aware discovery + theme export
+```
+
+---
+
+## Use it in one line
+
+**① As an MCP server — for AI agents (Claude Desktop / Code, Cursor, Codex).** No install, no clone:
+
+```json
+{ "mcpServers": { "eds": { "command": "npx", "args": ["-y", "github:Edwson/eds-mcp"] } } }
+```
+
+Drop that into your MCP client config and the agent gains all 18 tools. (Once it's on npm:
+`"args": ["-y", "eds-mcp-server"]`.)
+
+**② As an HTTP REST API — for any language, any tool, curl, a browser.** Runs with **zero dependencies**:
+
+```bash
+npx -y --package=github:Edwson/eds-mcp eds-mcp-http     # or: git clone … && node http.js   (no npm install needed)
+curl localhost:8787/v1/theme/css                        # the dual-theme token CSS
+curl localhost:8787/v1/regulation/FINRA%202111          # components that satisfy a rule
+curl -X POST localhost:8787/v1/scaffold -d '{"component":"OrderTicket"}'   # a method-compliant skeleton
+```
+
+`GET /` lists every endpoint; `GET /openapi.json` is a full OpenAPI 3.1 spec you can load into Swagger or
+Postman. Deploy it anywhere — or `docker build -t eds-mcp . && docker run -p 8787:8787 eds-mcp`.
+
+**③ As a library — in Node code.** The pure engine, importable directly:
+
+```js
+import { createCore } from 'eds-mcp-server';   // server, http, library: all the same core.js
 ```
 
 ---
@@ -102,6 +135,32 @@ reusable workflows that wire the tools together the right way.
 
 ---
 
+## HTTP REST API (for everyone who isn't an MCP client)
+
+The same engine, over plain HTTP + JSON, **zero dependencies** (Node built-ins only — runs straight from
+a clone with no `npm install`). CORS is open; every bad input returns `{ error }` with a `4xx`.
+
+| Method & path | Equivalent of |
+|---|---|
+| `GET /health` · `GET /v1/stats` · `GET /v1/method` | liveness · counts · the operating contract |
+| `GET /v1/tokens` · `GET /v1/tokens/{group}?theme=` · `GET /v1/token/{name}` | token groups · a group · one token |
+| `GET /v1/theme/{css\|json\|scss\|tailwind}` | `export_theme` |
+| `GET /v1/components?domain=` · `GET /v1/components/{id}` | `list_components` · `get_component` |
+| `GET /v1/components/{id}/contract` · `/register` | `get_data_contract` · `get_decision_register` |
+| `GET /v1/search?q=` · `GET /v1/regulation/{rule}` | `search_components` · `find_by_regulation` |
+| `POST /v1/recommend` · `POST /v1/bundle` | `recommend_component` · `bundle_components` |
+| `POST /v1/scaffold` · `POST /v1/lint` | `scaffold_component` · `lint_usage` |
+| `GET /` · `GET /openapi.json` | self-describing index · OpenAPI 3.1 spec |
+
+```bash
+node http.js                       # serve on $PORT (default 8787) — no install required
+npm run serve                      # same, via the package script
+curl localhost:8787/v1/components?domain=payments
+curl -s -X POST localhost:8787/v1/lint -d '{"tokens":["accent","nope"],"css":"a{color:#fff}"}'
+```
+
+---
+
 ## The killer move: `scaffold_component`
 
 Ask for a component and get correct structure back, not a guess:
@@ -144,17 +203,20 @@ eds.findByRegulation('SEC 17a-4');           // → components with WORM-retenti
 `server.js` is a thin MCP adapter over the same `core.js`, so the MCP tools and the library API can
 never drift apart.
 
-## Run
+## Run from source
 
 ```bash
 git clone https://github.com/Edwson/eds-mcp && cd eds-mcp
-npm install
+
+node http.js             # HTTP REST API on :8787 — runs with NO npm install (zero deps)
+
+npm install              # only the MCP server (the SDK/zod) + the test suites need this
+npm start                # MCP server over stdio
+npm run serve            # HTTP API (same as node http.js)
 npm run build:manifest   # regenerate manifest.json after any token/component change
-npm test                 # validate contracts + manifest sync + the engine (no SDK needed)
-npm start                # speaks MCP over stdio
 ```
 
-Register with an MCP client (`mcp.json`):
+Register the local MCP server with a client (`mcp.json`):
 
 ```json
 { "mcpServers": { "eds": { "command": "node", "args": ["server.js"], "cwd": "./eds-mcp" } } }
@@ -169,12 +231,13 @@ Requires Node 18+. The contract lives in `tokens.json` + `components.json`; edit
 ## Quality & CI
 
 Every push runs CI on **Node 18 / 20 / 22**: syntax check, ESLint, a **manifest-drift check**
-(`build-manifest` must produce no diff), the dependency-free contract test (`npm test`), and the
-**end-to-end MCP integration test** that boots the real server over stdio and exercises tools /
-resources / prompts through the SDK client (`npm run test:mcp`).
+(`build-manifest` must produce no diff), and **three test suites** — the dependency-free contract test
+(`npm test`), the **end-to-end MCP integration test** that boots the real server over stdio and exercises
+tools / resources / prompts through the SDK client (`npm run test:mcp`), and the **HTTP API integration
+test** that boots the real REST server and hits every endpoint (`npm run test:http`).
 
 ```bash
-npm run validate     # everything CI runs, locally: build:manifest + lint + test + test:mcp
+npm run validate     # everything CI runs, locally: build:manifest + lint + test + test:mcp + test:http
 ```
 
 Typed (`core.d.ts`), MIT-licensed, SemVer-versioned ([CHANGELOG](./CHANGELOG.md)). See
@@ -185,13 +248,17 @@ Typed (`core.d.ts`), MIT-licensed, SemVer-versioned ([CHANGELOG](./CHANGELOG.md)
 ```
 core.js            pure engine — all logic, dependency-free, importable as a library + test-covered
 core.d.ts          TypeScript declarations for the library API
+loadCore.js        builds a ready core from the bundled JSON (shared by server, http, tests)
 server.js          thin MCP adapter — 18 tools + 5 resources + 3 prompts over stdio
+http.js            zero-dependency HTTP REST API — 19 endpoints + OpenAPI 3.1 (node http.js)
 build-manifest.js  auto-sync engine — hashes contracts -> manifest.json
 tokens.json        token contract (color light/dark, space, radius, type, density)
 components.json    component contracts (purpose, when-to-use/not, props, a11y, regulatory, dataContract)
 test.js            dependency-free test — contract shape + manifest sync + full engine behaviour
-test-mcp.js        end-to-end integration test — boots the real server, exercises it via the SDK client
+test-mcp.js        end-to-end integration test — boots the real MCP server, exercises it via the SDK client
+test-http.js       end-to-end integration test — boots the real HTTP API, hits every endpoint
 manifest.json      generated — version + SHA-256 per file
+Dockerfile         zero-dependency image for the HTTP API
 .github/           CI workflow (Node 18/20/22), issue + PR templates, dependabot
 examples/          library usage + an MCP client config
 ```

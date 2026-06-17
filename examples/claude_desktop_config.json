@@ -1,9 +1,9 @@
 {
+  "_comment": "Add this to your MCP client (e.g. Claude Desktop). The npx form needs no clone and no npm publish — it runs the server straight from GitHub. Once the package is on npm, use \"eds-mcp-server\" instead of \"github:Edwson/eds-mcp\". To run from a local clone instead: command \"node\", args [\"server.js\"], cwd \"/absolute/path/to/eds-mcp\".",
   "mcpServers": {
     "eds": {
-      "command": "node",
-      "args": ["server.js"],
-      "cwd": "/absolute/path/to/eds-mcp"
+      "command": "npx",
+      "args": ["-y", "github:Edwson/eds-mcp"]
     }
   }
 }

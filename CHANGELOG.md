@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.15.0] — 2026-06-17
+### Added
+- **Zero-dependency HTTP REST API (`http.js`)** — the same `core.js` engine over plain HTTP + JSON, so
+  anyone can use it without an MCP client: 19 endpoints covering every capability (tokens, theme export,
+  component discovery, `find_by_regulation`, `recommend`, `bundle`, `scaffold`, `lint`), open CORS, a
+  self-describing index at `/`, and a full **OpenAPI 3.1** spec at `/openapi.json`. Uses only Node
+  built-ins — runs straight from a clone with no `npm install`.
+- **Instant install with no npm publish** — `npx -y github:Edwson/eds-mcp` runs the MCP server directly
+  from the repo; `npx -y --package=github:Edwson/eds-mcp eds-mcp-http` runs the HTTP API.
+- **`loadCore.js`** — one shared loader builds the core from the bundled JSON, so the MCP server, the HTTP
+  API, and the tests construct the engine identically (no drift).
+- **`Dockerfile`** — a zero-dependency image for the HTTP API (`docker run -p 8787:8787 eds-mcp`).
+- **`test-http.js`** — end-to-end HTTP integration test (boots the real server, hits every endpoint);
+  wired into `test:all`, `validate`, and CI.
+- New `bin` `eds-mcp-http`, the `npm run serve` script, and the `./http` package export.
+
+### Notes
+- No component-contract content changed; this bump is the new HTTP surface. The version stays in lockstep
+  across `tokens.json` / `components.json` / `manifest.json` / `package.json` (1.15.0).
+
 ## [1.14.0] — 2026-06-17
 ### Added
 - **Decoupled pure engine `core.js`** — `createCore({tokens, components, manifest})` returns the whole

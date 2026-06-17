@@ -1,6 +1,6 @@
 {
   "name": "edwson-design-system-components",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "note": "Each component is a CONTRACT, not just markup. The metadata (whenToUse / whenNot / props / a11y / regulatory / dataContract) is what lets an AI agent pick and wire the right component on the first try — which is where the token savings come from (fewer correction loops, no value regeneration).",
   "components": {
     "OrderTicket": {
