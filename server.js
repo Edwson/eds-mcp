@@ -1,41 +1,34 @@
 #!/usr/bin/env node
 /**
- * eds-mcp-server — Edwson Design System over the Model Context Protocol.
+ * eds-mcp-server — the Edwson Design System over the Model Context Protocol.
  *
- * Read-only. Exposes the token + component CONTRACT to any MCP-capable agent
- * (Claude Code, Codex, Cursor, …) as callable tools + resources, so an agent
- * pulls the exact slice it needs instead of having a whole CSS file / screenshots
- * pasted into its context every turn.
+ * A thin MCP adapter over core.js (the pure engine). Same logic also imports as a
+ * Node library and is exercised by the dependency-free test suite. The server turns
+ * the design system into a set of callable TOOLS, readable RESOURCES, and reusable
+ * PROMPTS so an agent pulls (and generates) exactly what it needs instead of having a
+ * whole CSS file / screenshots pasted into context every turn.
  *
  * Why this cuts an enterprise's AI-token bill:
- *  1. TARGETED RETRIEVAL — tools return only the requested tokens/component, not
- *     the whole system. Input tokens per request drop from ~10K (paste-the-CSS)
- *     to a few hundred.
- *  2. REFERENCE OUTPUT — the agent emits token NAMES ("--accent2") and component
- *     IDs ("OrderTicket"), not regenerated hex/CSS. Output tokens drop sharply.
- *  3. FEWER LOOPS — the contract (whenToUse / props / regulatory / dataContract)
- *     makes the agent right the first time; correction round-trips (the real cost
- *     driver) collapse toward 1.
- *  4. CACHE-FRIENDLY — outputs are deterministic and compact, so the static slice
- *     can sit behind prompt caching.
+ *  1. TARGETED RETRIEVAL — tools return only the requested slice, not the whole system.
+ *  2. REFERENCE OUTPUT — the agent emits token NAMES + component IDs, not regenerated CSS.
+ *  3. GENERATION — scaffold_component returns a method-compliant skeleton, so the agent
+ *     does not invent structure; lint_usage catches drift before it ships.
+ *  4. FEWER LOOPS — the contract makes the agent right the first time; correction
+ *     round-trips (the real cost driver) collapse toward 1.
  *
- * Every tool returns BOTH a text block and `structuredContent` (the same object,
- * machine-parseable). Errors set `isError: true` rather than masquerading as data.
+ * Every tool returns BOTH a text block and `structuredContent`. Failures set
+ * `isError: true` rather than masquerading as data.
  *
- * Tools (all read-only):
- *   list_token_groups               -> group names (tiny)
- *   get_tokens {group, theme?}      -> only the requested token group
- *   get_token {name, theme?}        -> resolve one token by name across groups
- *   search_components {query}       -> matching ids + one-line purpose
- *   list_components {domain?}       -> every component id + purpose + domain
- *   get_component {id}              -> a single component contract
- *   get_data_contract {id}          -> the component's data shape + 4 states
- *   get_manifest                    -> version + per-file checksums
- *   diff_since {version}            -> changed file list since a version (auto-sync)
+ * TOOLS (18)
+ *   reads:      list_token_groups · get_tokens · get_token · export_theme
+ *               list_components · get_component · get_data_contract · get_decision_register
+ *               search_components · find_by_regulation · recommend_component · bundle_components
+ *   generate:   scaffold_component · lint_usage
+ *   meta:       get_manifest · diff_since · get_method · get_stats
+ * RESOURCES (5) eds://tokens · eds://components · eds://manifest · eds://method · eds://regulatory
+ * PROMPTS (3)   build-regulated-component · compliance-review · accessibility-audit
  *
- * Resources (read-only, whole-file): eds://tokens, eds://components, eds://manifest
- *
- * Run:  npm install && node server.js     (speaks MCP over stdio). Requires Node 18+.
+ * Run:  npm install && node server.js   (speaks MCP over stdio). Requires Node 18+.
  */
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -43,177 +36,125 @@ import { dirname, join } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
+import { createCore } from './core.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const load = (f) => JSON.parse(readFileSync(join(here, f), 'utf8'));
-const TOKENS = load('tokens.json');
-const COMPONENTS = load('components.json').components;
-let MANIFEST = {};
-try { MANIFEST = load('manifest.json'); } catch { /* run build-manifest.js first */ }
+let manifest = {};
+try { manifest = load('manifest.json'); } catch { /* run build-manifest.js first */ }
 
-const VERSION = TOKENS.version || '0.0.0';
+const core = createCore({ tokens: load('tokens.json'), components: load('components.json'), manifest });
+const VERSION = core.version;
 
-const TOKEN_GROUPS = {
-  color: TOKENS.color,
-  space: TOKENS.space,
-  radius: TOKENS.radius,
-  type: TOKENS.type,
-  density: TOKENS.density
-};
-
-// Every result carries text (for humans/legacy) AND structuredContent (for agents).
 const ok = (obj) => ({ content: [{ type: 'text', text: JSON.stringify(obj) }], structuredContent: obj });
 const err = (obj) => ({ content: [{ type: 'text', text: JSON.stringify(obj) }], structuredContent: obj, isError: true });
-
-// Compact, list-friendly view of one component contract.
-const summarize = (id, c) => ({
-  id,
-  domain: c.domain || null,
-  purpose: c.purpose,
-  regulatory: c.regulatory || [],
-  nonRemovable: !!c.nonRemovable,
-  blocksAutonomousExecution: !!c.blocksAutonomousExecution,
-  requires: c.requires || []
-});
+const respond = (obj) => (obj && obj.error ? err(obj) : ok(obj));
 
 const server = new McpServer({ name: 'eds-mcp-server', version: VERSION });
+const tool = (name, meta, fn) => server.registerTool(name, meta, async (args) => respond(fn(args || {})));
 
-/* ─────────────────────────── TOOLS ─────────────────────────── */
-
-server.registerTool(
-  'list_token_groups',
+/* ───────────── TOOLS · token + theme reads ───────────── */
+tool('list_token_groups',
   { title: 'List token groups', description: 'Token group names only — the cheapest way to orient before fetching values.', inputSchema: {} },
-  async () => ok({ groups: Object.keys(TOKEN_GROUPS), version: VERSION })
-);
+  () => core.listTokenGroups());
 
-server.registerTool(
-  'get_tokens',
-  {
-    title: 'Get tokens',
-    description: 'Return only the requested token group (and theme for color). Avoids shipping the whole system.',
-    inputSchema: { group: z.string().describe('color | space | radius | type | density'), theme: z.enum(['light', 'dark']).optional() }
-  },
-  async ({ group, theme }) => {
-    const g = TOKEN_GROUPS[group];
-    if (!g) return err({ error: `unknown group: ${group}`, groups: Object.keys(TOKEN_GROUPS) });
-    if (group === 'color' && theme) return ok({ group, theme, tokens: g[theme] });
-    return ok({ group, tokens: g });
-  }
-);
+tool('get_tokens',
+  { title: 'Get tokens', description: 'Return only the requested token group (and theme for color). Avoids shipping the whole system.', inputSchema: { group: z.string().describe('color | space | radius | type | density'), theme: z.enum(['light', 'dark']).optional() } },
+  ({ group, theme }) => core.getTokens(group, theme));
 
-server.registerTool(
-  'get_token',
-  {
-    title: 'Get one token',
-    description: 'Resolve a single token by name (e.g. "accent2", "space.4", "radius.md") across every group. Returns its value(s), theme-aware for color.',
-    inputSchema: { name: z.string().describe('token name, e.g. accent2 / surface / 4 / md / xl'), theme: z.enum(['light', 'dark']).optional() }
-  },
-  async ({ name, theme }) => {
-    const key = String(name || '').replace(/^--/, '').replace(/^(color|space|radius|type|density)\./, '');
-    const hits = {};
-    const c = TOKENS.color || {};
-    if (c.light && key in c.light) hits.color = theme ? { [theme]: (c[theme] || {})[key] } : { light: c.light[key], dark: (c.dark || {})[key] };
-    if ((TOKENS.space || {})[key] !== undefined) hits.space = TOKENS.space[key];
-    if ((TOKENS.radius || {})[key] !== undefined) hits.radius = TOKENS.radius[key];
-    if (((TOKENS.type || {}).scale || {})[key] !== undefined) hits.type = TOKENS.type.scale[key];
-    if ((TOKENS.density || {})[key] !== undefined) hits.density = TOKENS.density[key];
-    if (Object.keys(hits).length === 0) return err({ error: `unknown token: ${name}`, hint: 'call list_token_groups / get_tokens to see valid names' });
-    return ok({ name: key, cssVar: `--${key}`, found: hits });
-  }
-);
+tool('get_token',
+  { title: 'Get one token', description: 'Resolve a single token by name (e.g. "accent2", "space.4", "radius.md") to its value(s) + canonical CSS var, theme-aware for color.', inputSchema: { name: z.string(), theme: z.enum(['light', 'dark']).optional() } },
+  ({ name, theme }) => core.getToken(name, theme));
 
-server.registerTool(
-  'search_components',
-  {
-    title: 'Search components',
-    description: 'Find components by keyword (matches id, purpose, domain, regulatory). Returns ids + one-line purpose so the agent picks without loading everything.',
-    inputSchema: { query: z.string() }
-  },
-  async ({ query }) => {
-    const q = String(query || '').toLowerCase().trim();
-    const entries = Object.entries(COMPONENTS);
-    const hits = (q === '' ? entries : entries.filter(([id, c]) =>
-      (id + ' ' + c.purpose + ' ' + (c.domain || '') + ' ' + (c.regulatory || []).join(' ')).toLowerCase().includes(q)))
-      .map(([id, c]) => ({ id, domain: c.domain || null, purpose: c.purpose }));
-    return ok({ query: q, count: hits.length, results: hits });
-  }
-);
+tool('export_theme',
+  { title: 'Export theme', description: 'Emit the whole token set as ready-to-use css | json | scss | tailwind. Dual-theme, self-consistent with scaffold_component variable names.', inputSchema: { format: z.enum(['css', 'json', 'scss', 'tailwind']) } },
+  ({ format }) => core.exportTheme(format));
 
-server.registerTool(
-  'list_components',
-  {
-    title: 'List components',
-    description: 'Every component id + purpose + domain + regulatory flags, optionally filtered by domain. Orientation without loading full contracts.',
-    inputSchema: { domain: z.string().optional().describe('trading | compliance | ai | ai-cost | data-eng | ai-infra') }
-  },
-  async ({ domain }) => {
-    const d = domain ? String(domain).toLowerCase() : null;
-    const list = Object.entries(COMPONENTS)
-      .filter(([, c]) => !d || (c.domain || '').toLowerCase() === d)
-      .map(([id, c]) => summarize(id, c));
-    const domains = [...new Set(Object.values(COMPONENTS).map((c) => c.domain).filter(Boolean))].sort();
-    return ok({ domain: d, count: list.length, domains, components: list });
-  }
-);
+/* ───────────── TOOLS · component discovery ───────────── */
+tool('list_components',
+  { title: 'List components', description: 'Every component id + purpose + domain + regulatory flags, optionally filtered by domain.', inputSchema: { domain: z.string().optional() } },
+  ({ domain }) => core.listComponents(domain));
 
-server.registerTool(
-  'get_component',
-  { title: 'Get component contract', description: 'Full contract for one component: purpose, props, whenToUse/whenNot, a11y, regulatory anchors, tokens, dataContract.', inputSchema: { id: z.string() } },
-  async ({ id }) => {
-    const c = COMPONENTS[id];
-    if (!c) return err({ error: `unknown component: ${id}`, available: Object.keys(COMPONENTS) });
-    return ok({ id, ...c });
-  }
-);
+tool('get_component',
+  { title: 'Get component contract', description: 'Full contract: purpose, props, whenToUse/whenNot, a11y, regulatory anchors, tokens, dataContract.', inputSchema: { id: z.string() } },
+  ({ id }) => core.getComponent(id));
 
-server.registerTool(
-  'get_data_contract',
+tool('get_data_contract',
   { title: 'Get data contract', description: 'The data shape + required render states (loading / empty / error / stale) for a component.', inputSchema: { id: z.string() } },
-  async ({ id }) => {
-    const c = COMPONENTS[id];
-    if (!c) return err({ error: `unknown component: ${id}`, available: Object.keys(COMPONENTS) });
-    return ok({ id, dataContract: c.dataContract || null });
-  }
-);
+  ({ id }) => core.getDataContract(id));
 
-server.registerTool(
-  'get_manifest',
-  { title: 'Get manifest', description: 'Version + per-file SHA-256 checksums for sync verification.', inputSchema: {} },
-  async () => ok(MANIFEST)
-);
+tool('get_decision_register',
+  { title: 'Get decision register', description: 'The four-cell register (when to use / when not & instead / behaviour & a11y / regulatory) — the line between a kit and a system.', inputSchema: { id: z.string() } },
+  ({ id }) => core.getDecisionRegister(id));
 
-server.registerTool(
-  'diff_since',
-  {
-    title: 'Diff since version',
-    description: 'Given a consumer version, report whether a newer contract exists so the consumer pulls only the delta. Auto-sync primitive.',
-    inputSchema: { version: z.string() }
-  },
-  async ({ version }) => {
-    const current = MANIFEST.version || VERSION;
-    return ok({
-      consumerVersion: version,
-      currentVersion: current,
-      upToDate: version === current,
-      changedFiles: version === current ? [] : Object.keys(MANIFEST.files || {}),
-      checksums: MANIFEST.files || {}
-    });
-  }
-);
+tool('search_components',
+  { title: 'Search components', description: 'Ranked keyword search across id, domain, regulatory, purpose, whenToUse. Returns ids + purpose + score.', inputSchema: { query: z.string() } },
+  ({ query }) => core.searchComponents(query));
 
-/* ─────────────────────── RESOURCES (whole-file, read-only) ─────────────────────── */
-// Added only if the installed SDK exposes registerResource, so tools work on any 1.x.
+tool('find_by_regulation',
+  { title: 'Find by regulation', description: 'Find every component that serves a given rule (e.g. "FINRA 2111", "NACHA", "SEC 17a-4"). Compliance-driven discovery.', inputSchema: { rule: z.string() } },
+  ({ rule }) => core.findByRegulation(rule));
+
+tool('recommend_component',
+  { title: 'Recommend a component', description: 'Describe a use case in natural language; get ranked component recommendations, each with its whenNot warning so the agent avoids misuse.', inputSchema: { useCase: z.string(), limit: z.number().int().positive().optional() } },
+  ({ useCase, limit }) => core.recommend(useCase, limit));
+
+tool('bundle_components',
+  { title: 'Bundle components', description: 'Resolve `requires` transitively and return a dependency-ordered set (deps first) plus the union of tokens + regulatory anchors. For composing a surface.', inputSchema: { ids: z.array(z.string()) } },
+  ({ ids }) => core.bundle(ids));
+
+/* ───────────── TOOLS · generation + checks ───────────── */
+tool('scaffold_component',
+  { title: 'Scaffold a component', description: 'Generate a paste-ready, method-compliant skeleton (ds-section HTML + scoped tokens-only CSS + delegated reduced-motion-safe JS + the four-cell register) from a component contract. The killer tool: the agent gets correct structure, not invented structure.', inputSchema: { id: z.string() } },
+  ({ id }) => core.scaffoldComponent(id));
+
+tool('lint_usage',
+  { title: 'Lint a usage', description: 'Validate a proposed usage against the system: token names must resolve, render states must be canonical, and CSS must be tokens-only (no hardcoded hex/rgb, no inline styles). Returns issues by severity.', inputSchema: { tokens: z.array(z.string()).optional(), states: z.array(z.string()).optional(), css: z.string().optional() } },
+  ({ tokens, states, css }) => core.lintUsage({ tokens, states, css }));
+
+/* ───────────── TOOLS · meta ───────────── */
+tool('get_manifest', { title: 'Get manifest', description: 'Version + per-file SHA-256 checksums for sync verification.', inputSchema: {} }, () => core.getManifest());
+tool('diff_since', { title: 'Diff since version', description: 'Given a consumer version, report whether a newer contract exists so it pulls only the delta. Auto-sync primitive.', inputSchema: { version: z.string() } }, ({ version }) => core.diffSince(version));
+tool('get_method', { title: 'Get the method', description: 'The Edwson operating contract — the nine non-negotiables + verification gates that every component and scaffold satisfies. The Ed-agent in machine-readable form.', inputSchema: {} }, () => core.getMethod());
+tool('get_stats', { title: 'Get system stats', description: 'System overview: version, component + domain counts, regulatory-framework coverage, token count.', inputSchema: {} }, () => core.getStats());
+
+/* ───────────── RESOURCES (whole-file, read-only) ───────────── */
 if (typeof server.registerResource === 'function') {
   const res = (uri, obj) => ({ contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(obj, null, 2) }] });
+  const regulatoryIndex = () => {
+    const map = {};
+    for (const c of core.listComponents().components) for (const r of (c.regulatory || [])) (map[r] = map[r] || []).push(c.id);
+    return { version: VERSION, frameworks: Object.keys(map).sort().map((r) => ({ regulation: r, components: map[r] })) };
+  };
   try {
-    server.registerResource('tokens', 'eds://tokens', { title: 'Design tokens', description: 'Full token contract (color light/dark, space, radius, type, density).', mimeType: 'application/json' }, async (uri) => res(uri.href, TOKENS));
-    server.registerResource('components', 'eds://components', { title: 'Component index', description: 'Every component id + purpose + domain + regulatory flags.', mimeType: 'application/json' }, async (uri) => res(uri.href, { version: VERSION, count: Object.keys(COMPONENTS).length, components: Object.entries(COMPONENTS).map(([id, c]) => summarize(id, c)) }));
-    server.registerResource('manifest', 'eds://manifest', { title: 'Sync manifest', description: 'Version + per-file SHA-256 checksums.', mimeType: 'application/json' }, async (uri) => res(uri.href, MANIFEST));
+    server.registerResource('tokens', 'eds://tokens', { title: 'Design tokens', description: 'Full token contract (color light/dark, space, radius, type, density).', mimeType: 'application/json' }, async (uri) => res(uri.href, load('tokens.json')));
+    server.registerResource('components', 'eds://components', { title: 'Component index', description: 'Every component id + purpose + domain + regulatory flags.', mimeType: 'application/json' }, async (uri) => res(uri.href, core.listComponents()));
+    server.registerResource('manifest', 'eds://manifest', { title: 'Sync manifest', description: 'Version + per-file SHA-256 checksums.', mimeType: 'application/json' }, async (uri) => res(uri.href, core.getManifest()));
+    server.registerResource('method', 'eds://method', { title: 'The method', description: 'The nine non-negotiables + verification gates — the Ed-agent operating contract.', mimeType: 'application/json' }, async (uri) => res(uri.href, core.getMethod()));
+    server.registerResource('regulatory', 'eds://regulatory', { title: 'Regulatory index', description: 'Every regulation mapped to the components that serve it.', mimeType: 'application/json' }, async (uri) => res(uri.href, regulatoryIndex()));
   } catch (e) {
     console.error('[eds-mcp-server] resources unavailable on this SDK build — tools still active:', e && e.message);
   }
 }
 
+/* ───────────── PROMPTS (reusable, contract-grounded) ───────────── */
+if (typeof server.registerPrompt === 'function') {
+  const msg = (text) => ({ messages: [{ role: 'user', content: { type: 'text', text } }] });
+  try {
+    server.registerPrompt('build-regulated-component',
+      { title: 'Build a regulated component', description: 'Generate a method-compliant component from its contract.', argsSchema: { id: z.string() } },
+      ({ id }) => msg(`Build the "${id}" component the Edwson way. First call get_component {id:"${id}"} and scaffold_component {id:"${id}"}, then complete the skeleton: keep every colour a token (var), one delegated listener, render once on load, status in words, reduced-motion path renders the final state. Honour the regulatory anchor in the decision register. Before finishing, call lint_usage on your tokens + CSS and fix every error.`));
+    server.registerPrompt('compliance-review',
+      { title: 'Compliance review', description: 'Review a surface against a regulation using the components that serve it.', argsSchema: { regulation: z.string() } },
+      ({ regulation }) => msg(`Review the current design against "${regulation}". Call find_by_regulation {rule:"${regulation}"} to see which components encode it, then check the surface honours each one (the gate, the disclosure, the retention, the finality) and is jurisdiction-correct. Flag anything missing with the specific component that would close it.`));
+    server.registerPrompt('accessibility-audit',
+      { title: 'Accessibility audit', description: 'Audit a component against its behaviour & accessibility contract.', argsSchema: { id: z.string() } },
+      ({ id }) => msg(`Audit "${id}" against its accessibility contract. Call get_decision_register {id:"${id}"} and get_method, then verify: status in words not colour alone, focus visible, keyboard-operable controls, real text kept programmatic, and the reduced-motion path renders the final state. Report each as pass/fail with the fix.`));
+  } catch (e) {
+    console.error('[eds-mcp-server] prompts unavailable on this SDK build — tools still active:', e && e.message);
+  }
+}
+
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error(`[eds-mcp-server] ready · v${VERSION} · ${Object.keys(COMPONENTS).length} components · read-only · stdio`);
+console.error(`[eds-mcp-server] ready · v${VERSION} · 18 tools · 5 resources · 3 prompts · stdio`);

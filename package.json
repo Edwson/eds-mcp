@@ -1,8 +1,14 @@
 {
   "name": "eds-mcp-server",
-  "version": "1.13.0",
-  "description": "Edwson Design System over MCP — read-only token + component contract for AI agents. Auto-syncs across an org and cuts AI-token spend by serving targeted, reference-based, cache-friendly slices instead of pasted CSS/screenshots.",
+  "version": "1.14.0",
+  "description": "Edwson Design System over MCP — a token + component contract engine for AI agents. 18 tools / 5 resources / 3 prompts: not just reads but code-generation (scaffold_component), linting (lint_usage), regulation-aware discovery (find_by_regulation), recommendations, and theme export (css/json/scss/tailwind). Pure core.js is importable as a library. Cuts AI-token spend by serving targeted, reference-based slices instead of pasted CSS/screenshots.",
   "type": "module",
+  "main": "core.js",
+  "exports": {
+    ".": "./core.js",
+    "./core": "./core.js",
+    "./server": "./server.js"
+  },
   "bin": {
     "eds-mcp-server": "server.js"
   },
@@ -32,7 +38,13 @@
     "ai-native",
     "claude",
     "cursor",
-    "codex"
+    "codex",
+    "scaffolding",
+    "code-generation",
+    "design-tokens-export",
+    "tailwind",
+    "accessibility",
+    "compliance"
   ],
   "repository": {
     "type": "git",
@@ -43,6 +55,7 @@
     "url": "https://github.com/Edwson/eds-mcp/issues"
   },
   "files": [
+    "core.js",
     "server.js",
     "build-manifest.js",
     "tokens.json",
