@@ -22,7 +22,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Syntax check
-        run: node --check core.js && node --check server.js && node --check build-manifest.js && node --check test.js && node --check test-mcp.js
+        run: node --check core.js && node --check loadCore.js && node --check server.js && node --check http.js && node --check build-manifest.js && node --check test.js && node --check test-mcp.js && node --check test-http.js
       - name: Lint
         run: npm run lint
       - name: Manifest is in sync
@@ -31,3 +31,5 @@ jobs:
         run: npm test
       - name: End-to-end MCP integration test
         run: npm run test:mcp
+      - name: End-to-end HTTP API integration test
+        run: npm run test:http
