@@ -4,6 +4,7 @@
   "description": "Edwson Design System over MCP — a token + component contract engine for AI agents. 18 tools / 5 resources / 3 prompts: not just reads but code-generation (scaffold_component), linting (lint_usage), regulation-aware discovery (find_by_regulation), recommendations, and theme export (css/json/scss/tailwind). Pure core.js is importable as a library. Cuts AI-token spend by serving targeted, reference-based slices instead of pasted CSS/screenshots.",
   "type": "module",
   "main": "core.js",
+  "types": "core.d.ts",
   "exports": {
     ".": "./core.js",
     "./core": "./core.js",
@@ -15,7 +16,13 @@
   "scripts": {
     "start": "node server.js",
     "build:manifest": "node build-manifest.js",
-    "test": "node test.js"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "node test.js",
+    "test:mcp": "node test-mcp.js",
+    "test:all": "npm test && npm run test:mcp",
+    "validate": "npm run build:manifest && npm run lint && npm run test:all",
+    "prepublishOnly": "npm run build:manifest && npm test"
   },
   "engines": {
     "node": ">=18"
@@ -23,6 +30,10 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "eslint": "^9.13.0"
   },
   "license": "MIT",
   "author": "Ed Chen",
@@ -56,12 +67,16 @@
   },
   "files": [
     "core.js",
+    "core.d.ts",
     "server.js",
     "build-manifest.js",
     "tokens.json",
     "components.json",
     "manifest.json",
     "test.js",
+    "test-mcp.js",
+    "LICENSE",
+    "CHANGELOG.md",
     "README.md"
   ]
 }

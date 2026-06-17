@@ -46,6 +46,21 @@ try { manifest = load('manifest.json'); } catch { /* run build-manifest.js first
 const core = createCore({ tokens: load('tokens.json'), components: load('components.json'), manifest });
 const VERSION = core.version;
 
+// CLI: respond to --version / --help before opening the stdio transport.
+const argv = process.argv.slice(2);
+if (argv.includes('--version') || argv.includes('-v')) { process.stdout.write(VERSION + '\n'); process.exit(0); }
+if (argv.includes('--help') || argv.includes('-h')) {
+  process.stdout.write(
+    `eds-mcp-server v${VERSION} — the Edwson Design System over MCP\n\n` +
+    `Usage:\n  node server.js            speak MCP over stdio (default)\n` +
+    `  node server.js --version  print version and exit\n  node server.js --help     show this help\n\n` +
+    `18 tools · 5 resources · 3 prompts. Docs: https://github.com/Edwson/eds-mcp\n`);
+  process.exit(0);
+}
+if (!manifest || !manifest.version) {
+  console.error('[eds-mcp-server] warning: manifest.json missing or stale — run `npm run build:manifest`.');
+}
+
 const ok = (obj) => ({ content: [{ type: 'text', text: JSON.stringify(obj) }], structuredContent: obj });
 const err = (obj) => ({ content: [{ type: 'text', text: JSON.stringify(obj) }], structuredContent: obj, isError: true });
 const respond = (obj) => (obj && obj.error ? err(obj) : ok(obj));

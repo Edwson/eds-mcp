@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "eds": {
+      "command": "node",
+      "args": ["server.js"],
+      "cwd": "/absolute/path/to/eds-mcp"
+    }
+  }
+}
