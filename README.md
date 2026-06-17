@@ -1,5 +1,10 @@
 # eds-mcp-server — the Edwson Design System over MCP
 
+[![CI](https://github.com/Edwson/eds-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Edwson/eds-mcp/actions/workflows/ci.yml)
+![Node](https://img.shields.io/badge/node-%E2%89%A518-3c873a)
+![MCP](https://img.shields.io/badge/MCP-server%20%2B%20library-6e56cf)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+
 A [Model Context Protocol](https://modelcontextprotocol.io) server **and** a pure JavaScript library
 that hands your design-system **token + component contract** to any AI agent (Claude Code, Codex,
 Cursor, …) — not just to *read*, but to **scaffold correct code, lint a proposed usage, discover
@@ -161,14 +166,32 @@ Requires Node 18+. The contract lives in `tokens.json` + `components.json`; edit
 55 component contracts span eleven domains — `trading`, `compliance`, `payments`, `ai`, `ml`,
 `ai-cost`, `data-eng`, `ai-infra`, `b2b`, `a11y`, `platform`.
 
+## Quality & CI
+
+Every push runs CI on **Node 18 / 20 / 22**: syntax check, ESLint, a **manifest-drift check**
+(`build-manifest` must produce no diff), the dependency-free contract test (`npm test`), and the
+**end-to-end MCP integration test** that boots the real server over stdio and exercises tools /
+resources / prompts through the SDK client (`npm run test:mcp`).
+
+```bash
+npm run validate     # everything CI runs, locally: build:manifest + lint + test + test:mcp
+```
+
+Typed (`core.d.ts`), MIT-licensed, SemVer-versioned ([CHANGELOG](./CHANGELOG.md)). See
+[CONTRIBUTING](./CONTRIBUTING.md), [SECURITY](./SECURITY.md), and runnable [`examples/`](./examples).
+
 ## Files
 
 ```
 core.js            pure engine — all logic, dependency-free, importable as a library + test-covered
+core.d.ts          TypeScript declarations for the library API
 server.js          thin MCP adapter — 18 tools + 5 resources + 3 prompts over stdio
 build-manifest.js  auto-sync engine — hashes contracts -> manifest.json
 tokens.json        token contract (color light/dark, space, radius, type, density)
 components.json    component contracts (purpose, when-to-use/not, props, a11y, regulatory, dataContract)
 test.js            dependency-free test — contract shape + manifest sync + full engine behaviour
+test-mcp.js        end-to-end integration test — boots the real server, exercises it via the SDK client
 manifest.json      generated — version + SHA-256 per file
+.github/           CI workflow (Node 18/20/22), issue + PR templates, dependabot
+examples/          library usage + an MCP client config
 ```

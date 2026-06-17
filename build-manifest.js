@@ -50,7 +50,10 @@ const domains = [...new Set(Object.values(components.components || {}).map((c) =
 const manifest = {
   name: 'edwson-design-system',
   version,
-  generatedAt: new Date().toISOString(),
+  // No wall-clock timestamp on purpose: the manifest must be deterministic so a rebuild
+  // produces no diff (CI asserts `git diff --exit-code manifest.json`). Change is detected
+  // by per-file sha256 + the SemVer `version`, not by time.
+  generator: 'build-manifest.js',
   summary: { tokens: tokenCount, components: componentCount, domains, componentIds },
   files,
   sync: {
