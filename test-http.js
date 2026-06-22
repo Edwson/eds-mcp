@@ -57,6 +57,18 @@ try {
   r = await post('/v1/lint', { tokens: ['accent', 'definitely-not-a-token'], states: ['nope'], css: 'a{color:#abcdef} b{background:rgb(1,2,3)}' });
   ok(r.status === 200 && r.body.ok === false && r.body.issues.some((i) => i.code === 'unknown-token') && r.body.issues.some((i) => i.code === 'bad-state') && r.body.issues.some((i) => i.code === 'hardcoded-color'), 'POST /v1/lint catches token + state + colour issues');
 
+  console.log('accessibility + compliance + composition');
+  r = await get('/v1/components/' + id + '/a11y');
+  ok(r.status === 200 && r.body.score && r.body.score.passed === r.body.score.of && Array.isArray(r.body.contrast), 'GET /v1/components/{id}/a11y passes the contract');
+  r = await get('/v1/contrast?theme=dark');
+  ok(r.status === 200 && Array.isArray(r.body.pairs.dark) && Array.isArray(r.body.failures), 'GET /v1/contrast returns the ladder + failures');
+  r = await get('/v1/compliance?jurisdiction=us');
+  ok(r.status === 200 && r.body.count >= 1 && Array.isArray(r.body.anchorsPresent), 'GET /v1/compliance?jurisdiction=us maps anchors');
+  r = await post('/v1/compose', { components: [id] });
+  ok(r.status === 200 && Array.isArray(r.body.steps) && r.body.steps.length === r.body.order.length, 'POST /v1/compose resolves a flow');
+  r = await post('/v1/scaffold-test', { component: id });
+  ok(r.status === 200 && r.body.file && /assert/.test(r.body.files[r.body.file] || ''), 'POST /v1/scaffold-test emits a conformance test');
+
   console.log('error handling');
   r = await get('/v1/components/__nope__');
   ok(r.status === 400 && r.body.error, 'unknown component → 400 with { error }');

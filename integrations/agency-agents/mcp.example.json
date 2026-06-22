@@ -1,0 +1,15 @@
+{
+  "_comment": "Register eds-mcp as the toolset for the Regulated-Finance Design-System Engineer (or any Agency specialist). Works with no npm publish via npx github:Edwson/eds-mcp. Drop the relevant block into your MCP client config (e.g. claude_desktop_config.json).",
+  "mcpServers": {
+    "eds-mcp": {
+      "command": "npx",
+      "args": ["-y", "github:Edwson/eds-mcp"]
+    }
+  },
+  "_alternativeHttp": {
+    "_comment": "Prefer plain HTTP? Run the zero-dependency API instead and point any client at it.",
+    "run": "npx -y --package=github:Edwson/eds-mcp eds-mcp-http",
+    "baseUrl": "http://localhost:8787",
+    "openapi": "http://localhost:8787/openapi.json"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "eds-mcp-server",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "description": "Edwson Design System over MCP + HTTP — a token + component contract engine for AI agents AND any HTTP client. 18 MCP tools / 5 resources / 3 prompts plus a zero-dependency REST API (OpenAPI 3.1). Not just reads but code-generation (scaffold_component), linting (lint_usage), regulation-aware discovery (find_by_regulation), recommendations, and theme export (css/json/scss/tailwind). Pure core.js is importable as a library. Cuts AI-token spend by serving targeted, reference-based slices instead of pasted CSS/screenshots.",
   "type": "module",
   "main": "core.js",
@@ -62,7 +62,13 @@
     "compliance",
     "rest-api",
     "http-api",
-    "openapi"
+    "openapi",
+    "wcag",
+    "agency-agents",
+    "lending",
+    "wealth",
+    "kyc",
+    "conformance-tests"
   ],
   "repository": {
     "type": "git",
@@ -88,6 +94,7 @@
     "Dockerfile",
     "LICENSE",
     "CHANGELOG.md",
-    "README.md"
+    "README.md",
+    "integrations"
   ]
 }

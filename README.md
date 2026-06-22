@@ -17,8 +17,8 @@ This is the runnable backbone behind the "AI-Native Development" section of the
 [design system showcase](https://edwson.com/design-system-showcase.html).
 
 ```
-MCP: 18 tools · 5 resources · 3 prompts     HTTP: 19 REST endpoints · OpenAPI 3.1     Library: createCore()
-55 component contracts across 11 domains · reads + code-generation + linting + regulation-aware discovery + theme export
+MCP: 23 tools · 5 resources · 3 prompts     HTTP: 24 REST endpoints · OpenAPI 3.1     Library: createCore()
+65 component contracts across 14 domains · reads + code-generation + linting + accessibility & compliance audits + flow composition + theme export
 ```
 
 ---
@@ -31,7 +31,7 @@ MCP: 18 tools · 5 resources · 3 prompts     HTTP: 19 REST endpoints · OpenAPI
 { "mcpServers": { "eds": { "command": "npx", "args": ["-y", "github:Edwson/eds-mcp"] } } }
 ```
 
-Drop that into your MCP client config and the agent gains all 18 tools. (Once it's on npm:
+Drop that into your MCP client config and the agent gains all 23 tools. (Once it's on npm:
 `"args": ["-y", "eds-mcp-server"]`.)
 
 **② As an HTTP REST API — for any language, any tool, curl, a browser.** Runs with **zero dependencies**:
@@ -80,7 +80,7 @@ makes "which component satisfies FINRA 2111?" a one-call question.
 
 ---
 
-## Tools (18)
+## Tools (23)
 
 Every tool returns a text block **and** `structuredContent` (the same object, machine-parseable);
 failures set `isError: true` instead of masquerading as data.
@@ -113,6 +113,16 @@ failures set `isError: true` instead of masquerading as data.
 |---|---|
 | `scaffold_component {id}` | a paste-ready skeleton: `ds-section` HTML + scoped **tokens-only** CSS + delegated reduced-motion-safe JS + the four-cell register |
 | `lint_usage {tokens?, states?, css?}` | issues by severity: unknown tokens, non-canonical states, hardcoded colours, inline styles |
+| `scaffold_test {id}` | a dependency-free, runnable **conformance test** (tokens resolve · states canonical · anchors intact · a11y passes · CSS tokens-only) |
+
+**Accessibility, compliance & composition**
+
+| Tool | Returns |
+|---|---|
+| `audit_accessibility {id}` | static a11y audit against the contract (a11y text, error state, dual-theme lock-step, reduced-motion, anchor) + per-token contrast in both themes |
+| `contrast_report {theme?}` | the WCAG 2.1 contrast ladder for the token set, both themes, with AA / AA-large / AAA + a failures list |
+| `compliance_check {jurisdiction?, feature?}` | a jurisdiction (`us·eu·uk·au·sg·jp·global`) → the regulatory anchors + guardrail components present here (a coverage map, not legal advice) |
+| `compose_flow {ids[], name?}` | a dependency-resolved multi-component flow with a per-step decision register + the union of tokens + anchors |
 
 **Meta**
 
@@ -132,6 +142,19 @@ failures set `isError: true` instead of masquerading as data.
 
 `build-regulated-component {id}` · `compliance-review {regulation}` · `accessibility-audit {id}` —
 reusable workflows that wire the tools together the right way.
+
+---
+
+## Integrations · The Agency (agency-agents)
+
+eds-mcp ships a **drop-in specialist** for
+[The Agency](https://github.com/msitarzewski/agency-agents) — Matt Sitarzewski's open-source
+(MIT) collection of AI agent personas. The Agency gives an agent a personality and a workflow;
+eds-mcp gives it the design-system backend to build regulated UI **and prove it**. See
+[`integrations/agency-agents/`](./integrations/agency-agents/) for the
+`Regulated-Finance Design-System Engineer` persona (authored in The Agency's open format) plus an
+example MCP config. This is interoperability with attribution — no upstream files are copied or
+redistributed; please support the upstream project.
 
 ---
 
@@ -225,7 +248,7 @@ Register the local MCP server with a client (`mcp.json`):
 Requires Node 18+. The contract lives in `tokens.json` + `components.json`; edit those, re-run
 `build:manifest`, and every consumer picks up the delta.
 
-55 component contracts span eleven domains — `trading`, `compliance`, `payments`, `ai`, `ml`,
+65 component contracts span fourteen domains — `trading`, `compliance`, `payments`, `lending`, `wealth`, `identity`, `ai`, `ml`,
 `ai-cost`, `data-eng`, `ai-infra`, `b2b`, `a11y`, `platform`.
 
 ## Quality & CI
@@ -249,7 +272,7 @@ Typed (`core.d.ts`), MIT-licensed, SemVer-versioned ([CHANGELOG](./CHANGELOG.md)
 core.js            pure engine — all logic, dependency-free, importable as a library + test-covered
 core.d.ts          TypeScript declarations for the library API
 loadCore.js        builds a ready core from the bundled JSON (shared by server, http, tests)
-server.js          thin MCP adapter — 18 tools + 5 resources + 3 prompts over stdio
+server.js          thin MCP adapter — 23 tools + 5 resources + 3 prompts over stdio
 http.js            zero-dependency HTTP REST API — 19 endpoints + OpenAPI 3.1 (node http.js)
 build-manifest.js  auto-sync engine — hashes contracts -> manifest.json
 tokens.json        token contract (color light/dark, space, radius, type, density)

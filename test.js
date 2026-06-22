@@ -101,5 +101,35 @@ console.log('core · meta');
 ok(core.getMethod().nonNegotiables.length === 9, 'method exposes the nine non-negotiables');
 ok(core.getStats().components === ids.length && core.getStats().regulatoryFrameworks > 0, 'stats count components + regulatory frameworks');
 
+console.log('core · accessibility + compliance + composition');
+const au = core.auditAccessibility(ids[0]);
+ok(au && au.score && au.score.of >= 3 && au.score.passed === au.score.of, 'audit_accessibility passes the contract for ' + ids[0]);
+ok(Array.isArray(au.contrast) && au.contrast.every((p) => typeof p.ratio === 'number'), 'audit returns numeric per-token contrast');
+ok(core.auditAccessibility('NoSuchComponent').error, 'audit reports an error for an unknown id');
+// error-state is required only for async (loading) components; static/value-bound ones still pass
+const staticId = Object.keys(COMPONENTS).find((id) => { const st = ((COMPONENTS[id].dataContract || {}).states) || []; return !st.includes('loading'); });
+if (staticId) {
+  const sa = core.auditAccessibility(staticId);
+  const es = sa.checks.find((c) => c.check === 'error-state');
+  ok(sa.score.passed === sa.score.of && es && es.level === 'contract', 'static/value-bound component (' + staticId + ') passes — error-state is not required without a loading state');
+} else { ok(true, 'no static component to test error-state gating'); }
+ok(Object.keys(COMPONENTS).every((id) => { const st = ((COMPONENTS[id].dataContract || {}).states) || []; return !st.includes('loading') || st.includes('error'); }), 'every async (loading) component also declares an error state — no hidden failure-path gap');
+const cr = core.contrastReport();
+ok(cr.pairs.dark && cr.pairs.light && cr.pairs.dark.length === cr.pairs.light.length && Array.isArray(cr.failures), 'contrast_report covers both themes + a failures list');
+ok(cr.pairs.dark.every((p) => p.ratio == null || (p.ratio >= 1 && p.ratio <= 21)), 'contrast ratios are within the WCAG 1..21 range');
+const cc = core.complianceCheck({ jurisdiction: 'us' });
+ok(cc.count >= 1 && cc.matchedComponents.every((m) => Array.isArray(m.anchors) && m.anchors.length), 'compliance_check(us) returns anchored components');
+ok(core.complianceCheck({ jurisdiction: 'zz' }).error, 'compliance_check rejects an unknown jurisdiction');
+const flowIds = Object.entries(COMPONENTS).find(([, c]) => (c.requires || []).some((d) => COMPONENTS[d]));
+if (flowIds) {
+  const cf = core.composeFlow({ ids: [flowIds[0]] });
+  const dep = (flowIds[1].requires || []).find((d) => COMPONENTS[d]);
+  ok(cf.count >= 2 && cf.order.indexOf(dep) < cf.order.indexOf(flowIds[0]) && cf.steps.length === cf.order.length, 'compose_flow resolves deps-first with per-step register');
+} else { ok(true, 'compose_flow (no in-set requires to test) — structure check only'); }
+ok(core.composeFlow({ ids: [] }).error, 'compose_flow requires at least one id');
+const stt = core.scaffoldTest(ids[0]);
+ok(stt && stt.file && stt.files[stt.file] && stt.files[stt.file].includes(ids[0]) && /assert/.test(stt.files[stt.file]), 'scaffold_test emits a runnable conformance test');
+ok(core.scaffoldTest('NoSuchComponent').error, 'scaffold_test reports an error for an unknown id');
+
 console.log(fails === 0 ? '\nPASS — contract valid, in sync, and the engine behaves.' : `\nFAIL — ${fails} check(s) failed.`);
 process.exit(fails === 0 ? 0 : 1);

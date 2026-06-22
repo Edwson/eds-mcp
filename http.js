@@ -73,6 +73,19 @@ const ROUTES = [
   { method: 'POST', path: '/v1/lint',                      summary: 'Lint a proposed usage for unknown tokens, bad states, hardcoded colours, inline styles.',
     body: { tokens: 'string[]', states: 'string[]', css: 'string' },
     call: (c, x) => core.lintUsage(x.body) },
+
+  { method: 'GET',  path: '/v1/components/{id}/a11y',      summary: 'Static accessibility audit of a component against its contract (+ per-token contrast, both themes).',
+    call: (c, x) => core.auditAccessibility(x.params.id) },
+  { method: 'GET',  path: '/v1/contrast',                  summary: 'WCAG contrast ladder for the token set. ?theme=light|dark for one theme.',
+    call: (c, x) => core.contrastReport(x.query.get('theme') || undefined) },
+  { method: 'GET',  path: '/v1/compliance',                summary: 'Regulatory anchors + guardrail components present for a jurisdiction. ?jurisdiction=us|eu|uk|au|sg|jp|global&feature=kyc',
+    call: (c, x) => core.complianceCheck({ jurisdiction: x.query.get('jurisdiction') || undefined, feature: x.query.get('feature') || undefined }) },
+  { method: 'POST', path: '/v1/compose',                   summary: 'Compose a dependency-resolved multi-component flow from a list of ids.',
+    body: { components: 'string[] (component ids)', name: 'string (optional)' },
+    call: (c, x) => core.composeFlow({ ids: x.body.components || x.body.ids || [], name: x.body.name }) },
+  { method: 'POST', path: '/v1/scaffold-test',             summary: 'Generate a dependency-free contract-conformance smoke test for a component.',
+    body: { component: 'string (component id)' },
+    call: (c, x) => core.scaffoldTest(x.body.component || x.body.id) },
 ];
 
 /* ------------------------------------------------------------------ *
@@ -151,7 +164,8 @@ function openapi() {
     const params = [...r.path.matchAll(/\{(\w+)\}/g)].map((m) => ({ name: m[1], in: 'path', required: true, schema: { type: 'string' } }));
     if (r.path === '/v1/search') params.push({ name: 'q', in: 'query', required: false, schema: { type: 'string' } });
     if (r.path === '/v1/components') params.push({ name: 'domain', in: 'query', required: false, schema: { type: 'string' } });
-    if (r.path === '/v1/tokens/{group}' || r.path === '/v1/token/{name}') params.push({ name: 'theme', in: 'query', required: false, schema: { type: 'string', enum: ['light', 'dark'] } });
+    if (r.path === '/v1/tokens/{group}' || r.path === '/v1/token/{name}' || r.path === '/v1/contrast') params.push({ name: 'theme', in: 'query', required: false, schema: { type: 'string', enum: ['light', 'dark'] } });
+    if (r.path === '/v1/compliance') { params.push({ name: 'jurisdiction', in: 'query', required: false, schema: { type: 'string', enum: ['us', 'eu', 'uk', 'au', 'sg', 'jp', 'global'] } }); params.push({ name: 'feature', in: 'query', required: false, schema: { type: 'string' } }); }
     const op = {
       summary: r.summary,
       operationId: r.method.toLowerCase() + oapiPath.replace(/[/{}]/g, '_'),

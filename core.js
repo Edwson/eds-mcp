@@ -59,6 +59,40 @@ function tokenize(s) {
   return String(s || '').toLowerCase().split(/[^a-z0-9+]+/).filter((w) => w.length > 2);
 }
 
+/* ---------- WCAG contrast helpers (pure, hex only) ---------- */
+function hexToRgb(hex) {
+  const h = String(hex || '').trim().replace(/^#/, '');
+  if (!/^(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(h)) return null;
+  const f = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  return [parseInt(f.slice(0, 2), 16), parseInt(f.slice(2, 4), 16), parseInt(f.slice(4, 6), 16)];
+}
+function relLum(rgb) {
+  const a = rgb.map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+}
+function contrastRatio(h1, h2) {
+  const a = hexToRgb(h1); const b = hexToRgb(h2);
+  if (!a || !b) return null;
+  const l1 = relLum(a); const l2 = relLum(b);
+  return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+}
+function classifyContrast(r) {
+  if (r == null) return null;
+  return { ratio: Math.round(r * 100) / 100, AA: r >= 4.5, AAlarge: r >= 3, AAA: r >= 7, AAAlarge: r >= 4.5 };
+}
+
+/* Jurisdiction → regulator keywords. Used by complianceCheck to map a market to the
+   regulatory anchors PRESENT in this design system. A coverage map, not legal advice. */
+const JURISDICTIONS = {
+  us: { label: 'United States', regulators: ['sec', 'finra', 'fincen', 'nacha', 'reg e', 'reg bi', 'ofac', 'sr 11-7', '17a-4', '15c6', 'cftc', 'patriot', 'tila', 'reg z', 'ecob', 'ecoa', 'reg b', 'fdcpa', 'form crs'] },
+  eu: { label: 'European Union', regulators: ['mifid', 'psd2', 'sepa', 'gdpr', '6amld', 'esma', 'dora', 'iso 20022', '2018/389'] },
+  uk: { label: 'United Kingdom', regulators: ['fca', 'cobs', 'conc', 'psr', 'fos'] },
+  au: { label: 'Australia', regulators: ['asic', 'rg 268', 'rg 227', 'austrac', 'afsl', 'pds', 'tmd'] },
+  sg: { label: 'Singapore', regulators: ['mas'] },
+  jp: { label: 'Japan', regulators: ['appi', 'fsa', 'jfsa'] },
+  global: { label: 'Cross-border / FATF', regulators: ['fatf', 'bsa', 'iso 20022', 'swift', 'ffiec', 'iso/iec 29184'] }
+};
+
 export function createCore(data) {
   const TOKENS = data.tokens || {};
   const COMPONENTS = (data.components && data.components.components) || data.components || {};
@@ -340,6 +374,151 @@ ${stateBranches}
     };
   }
 
+  /* ---------- accessibility: static audit of a component against its contract ---------- */
+  function auditAccessibility(id) {
+    const c = COMPONENTS[id];
+    if (!c) return { error: `unknown component: ${id}`, available: Object.keys(COMPONENTS) };
+    const checks = [];
+    const add = (check, level, pass, detail) => checks.push({ check, level, pass, detail });
+    add('a11y-contract', 'required', !!(c.a11y && c.a11y.trim()),
+      c.a11y ? 'declares a behaviour & accessibility contract' : 'missing a11y contract text');
+    const states = ((c.dataContract || {}).states) || [];
+    if (states.includes('loading')) {
+      // async / data-bound: if it can load, it must handle the failure path in words, not colour alone
+      add('error-state', 'required', states.includes('error'),
+        states.includes('error') ? 'declares an error state (status in words, not colour alone)' : 'async component declares a loading state but no error state — the failure path may rely on colour alone');
+    } else {
+      // static or value-bound: there is no async load, so an error state is not a hard requirement
+      add('error-state', 'contract', true,
+        states.length ? 'value-bound (' + states.join(' / ') + ') — no async load; surface absence via the empty state, not an error state' : 'static component — no data binding, so no error state is required');
+    }
+    const color = TOKENS.color || {}; const light = color.light || {}; const dark = color.dark || {};
+    const colTokens = (c.tokens || []).map((t) => resolveToken(t)).filter((r) => r && r.group === 'color').map((r) => r.name);
+    const missingPair = colTokens.filter((k) => !(k in light) || !(k in dark));
+    add('dual-theme', 'required', missingPair.length === 0,
+      missingPair.length ? `colour token(s) missing a light/dark pair: ${missingPair.join(', ')}` : 'every colour token is defined for light and dark in lock-step');
+    add('reduced-motion', 'contract', true,
+      'method requires the final state to render instantly under prefers-reduced-motion — scaffold_component emits this guard; verify in the implementation');
+    if ((c.regulatory || []).length) add('reg-anchor', 'required', true, `anchored: ${(c.regulatory || []).join(' · ')}`);
+    const contrast = [];
+    for (const k of colTokens) {
+      for (const th of ['dark', 'light']) {
+        const cl = classifyContrast(contrastRatio((color[th] || {})[k], (color[th] || {}).surface));
+        if (cl) contrast.push({ token: k, theme: th, against: 'surface', ratio: cl.ratio, AA: cl.AA, AAlarge: cl.AAlarge });
+      }
+    }
+    const required = checks.filter((x) => x.level === 'required');
+    const passed = required.filter((x) => x.pass).length;
+    return {
+      id, score: { passed, of: required.length }, checks, contrast,
+      summary: passed === required.length ? 'passes the static accessibility contract checks' : `${required.length - passed} required check(s) need attention`,
+      note: 'Static checks derived from the component contract — they verify the contract, not a running DOM. Pair with the in-browser Accessibility Lab for live keyboard / screen-reader testing.'
+    };
+  }
+
+  /* ---------- compliance: jurisdiction → anchors + guardrail components present here ---------- */
+  function complianceCheck(input) {
+    const jurRaw = String((input && input.jurisdiction) || '').toLowerCase().trim();
+    const kw = tokenize((input && (input.feature || input.keywords)) || '');
+    const J = jurRaw ? JURISDICTIONS[jurRaw] : null;
+    if (jurRaw && !J) return { error: `unknown jurisdiction: ${input.jurisdiction}`, jurisdictions: Object.keys(JURISDICTIONS) };
+    const regulators = J ? J.regulators : [...new Set(Object.values(JURISDICTIONS).flatMap((x) => x.regulators))];
+    const matched = [];
+    for (const [id, c] of Object.entries(COMPONENTS)) {
+      const hit = (c.regulatory || []).filter((a) => regulators.some((r) => a.toLowerCase().includes(r)));
+      if (!hit.length) continue;
+      if (kw.length) { const hay = (id + ' ' + (c.purpose || '') + ' ' + (c.domain || '') + ' ' + (c.whenToUse || '') + ' ' + (c.regulatory || []).join(' ')).toLowerCase(); if (!kw.some((w) => hay.includes(w))) continue; }
+      matched.push({ id, domain: c.domain || null, anchors: hit, guardrail: c.whenToUse || c.purpose });
+    }
+    matched.sort((a, b) => a.id.localeCompare(b.id));
+    const anchorsPresent = [...new Set(matched.flatMap((m) => m.anchors))].sort();
+    return {
+      jurisdiction: J ? J.label : 'all markets', feature: (input && (input.feature || input.keywords)) || null,
+      count: matched.length, matchedComponents: matched, anchorsPresent,
+      note: 'Lists the regulatory anchors and guardrail components present in THIS design system for the jurisdiction — a coverage map for design, not legal advice.'
+    };
+  }
+
+  /* ---------- compose: a dependency-resolved multi-component flow ---------- */
+  function composeFlow(input) {
+    const ids = Array.isArray(input) ? input : ((input && input.ids) || []);
+    const name = (input && input.name) || 'flow';
+    if (!ids.length) return { error: 'provide ids: a list of component ids to compose into a flow' };
+    const b = bundle(ids);
+    const steps = b.order.map((id, i) => {
+      const c = COMPONENTS[id];
+      return { step: i + 1, id, domain: c.domain || null, purpose: c.purpose, whenToUse: c.whenToUse || null, regulatory: c.regulatory || [], states: ((c.dataContract || {}).states) || [], requires: c.requires || [] };
+    });
+    return {
+      name, requested: ids, order: b.order, missing: b.missing, steps, tokens: b.tokens, regulatory: b.regulatory, count: b.order.length,
+      note: 'Dependency-resolved (deps first). Union of tokens + regulatory anchors across the flow; scaffold each id for the skeleton and lint the assembled CSS.'
+    };
+  }
+
+  /* ---------- scaffold a contract-conformance smoke test for a component ---------- */
+  function scaffoldTest(id) {
+    const c = COMPONENTS[id];
+    if (!c) return { error: `unknown component: ${id}`, available: Object.keys(COMPONENTS) };
+    const states = ((c.dataContract || {}).states) || [];
+    const tokens = c.tokens || [];
+    const reg = c.regulatory || [];
+    const fname = `test-${kebab(id)}.mjs`;
+    const code =
+`/* ${fname} — contract-conformance smoke test for ${id}.
+   Dependency-free: run with \`node ${fname}\` (adjust the import paths to your project). */
+import assert from 'node:assert';
+import { createCore } from 'eds-mcp/core.js';
+import tokens from 'eds-mcp/tokens.json' assert { type: 'json' };
+import components from 'eds-mcp/components.json' assert { type: 'json' };
+import manifest from 'eds-mcp/manifest.json' assert { type: 'json' };
+
+const core = createCore({ tokens, components, manifest });
+const id = ${JSON.stringify(id)};
+const c = core.getComponent(id);
+assert.ok(!c.error, 'component resolves');
+
+// 1. every declared token resolves in the system
+for (const t of ${JSON.stringify(tokens)}) assert.ok(core.tokenKnown(t), 'token resolves: ' + t);
+// 2. declared states are a subset of the canonical states
+for (const s of ${JSON.stringify(states)}) assert.ok(core.CANON_STATES.includes(s), 'canonical state: ' + s);
+// 3. regulated component carries its anchor(s)
+assert.deepStrictEqual(c.regulatory || [], ${JSON.stringify(reg)}, 'regulatory anchors intact');
+// 4. static accessibility contract passes
+const a = core.auditAccessibility(id);
+assert.strictEqual(a.score.passed, a.score.of, 'a11y contract: ' + a.summary);
+// 5. scaffold emits tokens-only CSS (no hardcoded hex outside var())
+const css = core.scaffoldComponent(id).files.css.replace(/var\\([^)]*\\)/g, '');
+assert.ok(!/#[0-9a-fA-F]{3,8}\\b/.test(css), 'scaffold CSS is tokens-only');
+
+console.log('PASS ' + id + ' — contract conformance');
+`;
+    return {
+      id, file: fname, files: { [fname]: code },
+      asserts: ['tokens resolve', 'states canonical', 'regulatory anchors intact', 'a11y contract passes', 'scaffold CSS tokens-only'],
+      notes: 'A runnable conformance-test scaffold. Adjust import paths to your project; extend with DOM assertions for the live render.'
+    };
+  }
+
+  /* ---------- contrast: the WCAG ladder for the token set, both themes ---------- */
+  function contrastReport(theme) {
+    const color = TOKENS.color || {};
+    const themes = theme ? [String(theme).toLowerCase()] : ['dark', 'light'];
+    const PAIRS = [['text1', 'bg'], ['text1', 'surface'], ['text2', 'surface'], ['text3', 'surface'], ['accent2', 'surface'], ['accentFg', 'accent'], ['green', 'surface'], ['red', 'surface'], ['gold', 'surface']];
+    const out = {};
+    for (const th of themes) {
+      const c = color[th] || {};
+      out[th] = PAIRS.map(([fg, bg]) => {
+        const cl = classifyContrast(contrastRatio(c[fg], c[bg]));
+        return cl ? { fg, bg, ratio: cl.ratio, AA: cl.AA, AAlarge: cl.AAlarge, AAA: cl.AAA } : { fg, bg, ratio: null, note: 'non-hex token, skipped' };
+      });
+    }
+    const failures = Object.entries(out).flatMap(([th, arr]) => arr.filter((p) => p.ratio != null && p.AA === false).map((p) => ({ theme: th, fg: p.fg, bg: p.bg, ratio: p.ratio })));
+    return {
+      themes, pairs: out, failures,
+      note: 'WCAG 2.1 relative-luminance contrast. AA = 4.5:1 normal / 3:1 large; AAA = 7:1 normal. Foreground tokens over background tokens; decorative / non-text pairs may legitimately sit below AA.'
+    };
+  }
+
   /* ---------- meta ---------- */
   function getManifest() { return MANIFEST; }
   function diffSince(version) {
@@ -366,7 +545,9 @@ ${stateBranches}
     // components
     listComponents, getComponent, getDataContract, getDecisionRegister, searchComponents, findByRegulation, recommend, bundle, summarize, domainCounts,
     // generation + checks
-    scaffoldComponent, lintUsage,
+    scaffoldComponent, lintUsage, scaffoldTest,
+    // accessibility + compliance + composition
+    auditAccessibility, contrastReport, complianceCheck, composeFlow,
     // meta
     getManifest, diffSince, getMethod, getStats
   };

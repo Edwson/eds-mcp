@@ -31,7 +31,7 @@ try {
 
   console.log('discovery');
   const tools = (await client.listTools()).tools;
-  ok(tools.length === 18, `lists 18 tools (got ${tools.length})`);
+  ok(tools.length === 23, `lists 23 tools (got ${tools.length})`);
   ok(tools.every((t) => t.inputSchema && typeof t.description === 'string'), 'every tool advertises a description + input schema');
   const resources = (await client.listResources()).resources;
   ok(resources.length === 5, `lists 5 resources (got ${resources.length})`);
@@ -53,8 +53,22 @@ try {
   const tw = sc(await client.callTool({ name: 'export_theme', arguments: { format: 'tailwind' } }));
   ok(tw.output && tw.output.theme && tw.output.theme.extend, 'export_theme tailwind returns a config');
 
+  const aud = sc(await client.callTool({ name: 'audit_accessibility', arguments: { id: firstId } }));
+  ok(aud.score && aud.score.passed === aud.score.of && Array.isArray(aud.contrast), 'audit_accessibility passes the contract over the wire');
+
+  const comp = sc(await client.callTool({ name: 'compliance_check', arguments: { jurisdiction: 'us' } }));
+  ok(comp.count >= 1 && Array.isArray(comp.anchorsPresent), 'compliance_check(us) maps anchors to components');
+
+  const flow = sc(await client.callTool({ name: 'compose_flow', arguments: { ids: [firstId] } }));
+  ok(flow.count >= 1 && Array.isArray(flow.steps) && flow.steps.length === flow.order.length, 'compose_flow returns a deps-resolved flow');
+
+  const stest = sc(await client.callTool({ name: 'scaffold_test', arguments: { id: firstId } }));
+  ok(stest.file && stest.files[stest.file] && /assert/.test(stest.files[stest.file]), 'scaffold_test emits a runnable conformance test');
+
   const badResult = await client.callTool({ name: 'get_component', arguments: { id: 'NoSuchComponent' } });
   ok(badResult.isError === true, 'a bad request sets isError on the response');
+  const badJur = await client.callTool({ name: 'compliance_check', arguments: { jurisdiction: 'zz' } });
+  ok(badJur.isError === true, 'compliance_check rejects an unknown jurisdiction with isError');
 
   console.log('resources + prompts');
   const method = JSON.parse((await client.readResource({ uri: 'eds://method' })).contents[0].text);

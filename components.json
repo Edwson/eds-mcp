@@ -1,6 +1,6 @@
 {
   "name": "edwson-design-system-components",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "note": "Each component is a CONTRACT, not just markup. The metadata (whenToUse / whenNot / props / a11y / regulatory / dataContract) is what lets an AI agent pick and wire the right component on the first try — which is where the token savings come from (fewer correction loops, no value regeneration).",
   "components": {
     "OrderTicket": {
@@ -1704,6 +1704,366 @@
         ]
       },
       "domain": "payments"
+    },
+    "LoanOriginationStepper": {
+      "purpose": "Originate a consumer loan through disclosure and affordability gates before any commitment.",
+      "whenToUse": "Any flow that takes a borrower from quote to signed loan agreement.",
+      "whenNot": "Servicing an existing loan — use RepaymentSchedule; collections — use CollectionsNotice.",
+      "props": {
+        "amount": "number",
+        "termMonths": "number",
+        "purpose": "string",
+        "step": "number",
+        "consentGiven": "boolean"
+      },
+      "a11y": "One decision per step; APR and total cost shown in words and figures before SIGN; SIGN is the only irreversible control and is gated behind explicit consent.",
+      "regulatory": [
+        "TILA / Reg Z 12 CFR 1026 (cost-of-credit disclosure)",
+        "ECOA / Reg B 12 CFR 1002 (fair lending, no prohibited-basis fields)",
+        "UK FCA CONC 4 (pre-contract disclosure)"
+      ],
+      "tokens": [
+        "accent2",
+        "green",
+        "red",
+        "text1",
+        "border",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ amount, apr, totalRepayable, schedule, decision }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "requires": [
+        "APRDisclosure",
+        "AffordabilityCheck"
+      ],
+      "domain": "lending"
+    },
+    "APRDisclosure": {
+      "purpose": "Show the APR, finance charge, amount financed, and total of payments in the legally required form.",
+      "whenToUse": "Beside any credit offer, before the borrower commits.",
+      "whenNot": "Marketing teasers without a firm offer — those need representative-APR framing, not this box.",
+      "props": {
+        "apr": "number",
+        "financeCharge": "number",
+        "amountFinanced": "number",
+        "totalOfPayments": "number"
+      },
+      "a11y": "APR labelled as the most prominent figure; the four federal boxes are a table with headers, not colour-coded cells.",
+      "regulatory": [
+        "TILA / Reg Z 12 CFR 1026.18 (APR + finance charge disclosure)",
+        "UK FCA CONC 4.2 (APR prominence)"
+      ],
+      "tokens": [
+        "text1",
+        "text2",
+        "gold",
+        "surface",
+        "border",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ apr, financeCharge, amountFinanced, totalOfPayments }",
+        "states": [
+          "loading",
+          "error"
+        ]
+      },
+      "requires": [],
+      "domain": "lending"
+    },
+    "AffordabilityCheck": {
+      "purpose": "Assess and surface whether a borrower can sustainably afford the proposed loan.",
+      "whenToUse": "Before approval on any consumer-credit origination.",
+      "whenNot": "Hard credit-bureau scoring — that is a backend decision, not this surface.",
+      "props": {
+        "income": "number",
+        "obligations": "number",
+        "proposedPayment": "number",
+        "verdict": "pass|caution|fail"
+      },
+      "a11y": "Verdict stated in words (sustainable / caution / not affordable) with the ratio shown; failure blocks progression with a clear reason.",
+      "regulatory": [
+        "UK FCA CONC 5 (creditworthiness & affordability)",
+        "ECOA / Reg B (consistent, non-discriminatory assessment)"
+      ],
+      "tokens": [
+        "green",
+        "gold",
+        "red",
+        "text1",
+        "surface",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ dti, residualIncome, verdict, reasons }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "requires": [],
+      "domain": "lending"
+    },
+    "RepaymentSchedule": {
+      "purpose": "Render the full amortisation schedule — principal, interest, balance per period.",
+      "whenToUse": "Loan agreement review and ongoing servicing.",
+      "whenNot": "A single next-payment reminder — that is a lighter notice, not the full table.",
+      "props": {
+        "schedule": "array",
+        "currency": "string",
+        "highlightRow": "number?"
+      },
+      "a11y": "Scrollable data table with row/column headers; running balance announced; current period marked in text, not colour alone.",
+      "regulatory": [
+        "TILA / Reg Z 12 CFR 1026.18(g) (payment schedule)"
+      ],
+      "tokens": [
+        "text1",
+        "text2",
+        "border2",
+        "surface2",
+        "radius.md",
+        "space.3"
+      ],
+      "dataContract": {
+        "shape": "{ rows:[{ n, principal, interest, balance }] }",
+        "states": [
+          "loading",
+          "empty",
+          "error"
+        ]
+      },
+      "requires": [],
+      "domain": "lending"
+    },
+    "CollectionsNotice": {
+      "purpose": "Communicate an overdue balance and cure options with legally compliant, non-harassing tone.",
+      "whenToUse": "Past-due servicing where a regulated dunning notice is required.",
+      "whenNot": "Routine payment reminders before delinquency — use a gentle reminder, not a collections notice.",
+      "props": {
+        "amountDue": "number",
+        "daysPastDue": "number",
+        "cureOptions": "array",
+        "validationInfo": "string"
+      },
+      "a11y": "Plain-language amount and date; dispute / validation rights presented as readable text; no urgency styling that pressures via colour alone.",
+      "regulatory": [
+        "FDCPA 15 USC 1692 (debt-collection conduct + validation notice)",
+        "UK FCA CONC 7 (arrears, default & recovery)"
+      ],
+      "tokens": [
+        "text1",
+        "gold",
+        "red",
+        "surface",
+        "border",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ amountDue, daysPastDue, cureOptions, rights }",
+        "states": [
+          "loading",
+          "error",
+          "stale"
+        ]
+      },
+      "requires": [],
+      "domain": "lending"
+    },
+    "SuitabilityProfile": {
+      "purpose": "Capture and surface a client's objectives, horizon, and risk tolerance to gate recommendations.",
+      "whenToUse": "Before any investment recommendation or portfolio construction.",
+      "whenNot": "Execution-only order entry where no advice is given — use OrderTicket.",
+      "props": {
+        "objective": "string",
+        "horizonYears": "number",
+        "riskTolerance": "conservative|balanced|aggressive",
+        "capacityForLoss": "string"
+      },
+      "a11y": "Each factor is a labelled control; the resulting profile is summarised in words and feeds the suitability gate on downstream proposals.",
+      "regulatory": [
+        "FINRA Rule 2111 (suitability)",
+        "SEC Reg BI 17 CFR 240.15l-1(a)(2)(ii) (Care Obligation)",
+        "ESMA MiFID II suitability assessment"
+      ],
+      "tokens": [
+        "accent2",
+        "text1",
+        "text2",
+        "surface",
+        "border",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ objective, horizonYears, riskTolerance, capacityForLoss, profile }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "requires": [],
+      "domain": "wealth"
+    },
+    "FeeAndConflictDisclosure": {
+      "purpose": "Disclose fees, costs, and material conflicts of interest in a single client-readable surface.",
+      "whenToUse": "At account opening and beside any recommendation that carries a conflict.",
+      "whenNot": "Internal fee schedules for staff — this is the client-facing disclosure.",
+      "props": {
+        "fees": "array",
+        "conflicts": "array",
+        "acknowledged": "boolean"
+      },
+      "a11y": "Fees and conflicts itemised as readable text; acknowledgement is explicit and logged; no pre-checked consent.",
+      "regulatory": [
+        "SEC Reg BI 17 CFR 240.15l-1(a)(2)(i)-(iv) (Disclosure + Conflict obligations)",
+        "SEC Form CRS (relationship summary)",
+        "ESMA MiFID II costs & charges disclosure"
+      ],
+      "tokens": [
+        "text1",
+        "gold",
+        "surface",
+        "border",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ fees:[{ label, amount }], conflicts:[{ label, mitigation }], acknowledged }",
+        "states": [
+          "loading",
+          "error"
+        ]
+      },
+      "requires": [],
+      "domain": "wealth"
+    },
+    "PortfolioRebalanceProposal": {
+      "purpose": "Propose a rebalance the client (or advisor) must review and approve before any trades.",
+      "whenToUse": "Advisory rebalancing where a human approval gate is required.",
+      "whenNot": "Fully discretionary auto-rebalancing without a human in the loop — this surface requires sign-off.",
+      "props": {
+        "current": "array",
+        "proposed": "array",
+        "rationale": "string",
+        "approved": "boolean"
+      },
+      "a11y": "Each proposed change carries its rationale and evidence; nothing executes without explicit approval; reasoning is attached for the audit trail.",
+      "regulatory": [
+        "SEC Reg BI (Care Obligation)",
+        "SR 11-7 (model-risk effective challenge)",
+        "SEC Rule 17a-4(f) (records retention)"
+      ],
+      "tokens": [
+        "accent2",
+        "green",
+        "red",
+        "gold",
+        "text1",
+        "surface",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ current, proposed, drift, rationale, approval }",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "stale"
+        ]
+      },
+      "requires": [
+        "SuitabilityProfile"
+      ],
+      "nonRemovable": true,
+      "blocksAutonomousExecution": true,
+      "domain": "wealth"
+    },
+    "StepUpAuth": {
+      "purpose": "Request strong customer authentication at the moment of an elevated-risk action.",
+      "whenToUse": "Before a high-value payment, a new payee, or a sensitive settings change.",
+      "whenNot": "Low-risk reads — over-prompting trains users to dismiss; reserve for elevated risk.",
+      "props": {
+        "method": "passkey|totp|push",
+        "reason": "string",
+        "expiresInSec": "number"
+      },
+      "a11y": "Reason for the challenge stated in words; countdown announced via aria-live, not motion alone; one primary action, with an accessible fallback method.",
+      "regulatory": [
+        "PSD2 SCA (EU 2018/389 RTS — two-factor + dynamic linking)",
+        "FFIEC authentication guidance"
+      ],
+      "tokens": [
+        "accent2",
+        "green",
+        "red",
+        "text1",
+        "surface",
+        "border",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ method, reason, expiresInSec, status }",
+        "states": [
+          "loading",
+          "error",
+          "stale"
+        ]
+      },
+      "requires": [],
+      "domain": "identity"
+    },
+    "ConsentReceipt": {
+      "purpose": "Record and show exactly what a user consented to, when, and how to withdraw it.",
+      "whenToUse": "Any data-processing or marketing consent that must be auditable and revocable.",
+      "whenNot": "Contractual terms acceptance — that is a different legal basis than consent.",
+      "props": {
+        "purposes": "array",
+        "grantedAt": "string",
+        "withdrawable": "boolean"
+      },
+      "a11y": "Each purpose is a separate, clearly worded item; granting and withdrawing are equally easy; the receipt is readable text, not a hidden log.",
+      "regulatory": [
+        "GDPR Art. 7 (conditions for consent + easy withdrawal)",
+        "APPI (Japan — purpose specification & consent)",
+        "ISO/IEC 29184 (online privacy notices & consent)"
+      ],
+      "tokens": [
+        "accent2",
+        "text1",
+        "text2",
+        "surface",
+        "border",
+        "radius.md",
+        "space.4"
+      ],
+      "dataContract": {
+        "shape": "{ purposes:[{ id, label, granted }], grantedAt, withdrawnAt }",
+        "states": [
+          "loading",
+          "empty",
+          "error"
+        ]
+      },
+      "requires": [],
+      "domain": "identity"
     }
   }
 }

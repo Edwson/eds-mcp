@@ -4,6 +4,38 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.0] — 2026-06-22
+### Added
+- **Five new capability tools** (MCP 18 → 23; HTTP 19 → 24 endpoints), each over the same pure `core.js`:
+  - `audit_accessibility {id}` — static accessibility audit against the contract (a11y text present, error
+    state declared, every colour token defined for both themes in lock-step, reduced-motion guard,
+    regulatory anchor) **plus** a per-token WCAG contrast read in both themes. The error-state check is required
+    only for **async (loading) components** — a static or value-bound component (no loading state) legitimately
+    needs no error state, so it is not penalised; a component that declares `loading` but no `error` still fails.
+  - `contrast_report {theme?}` — the WCAG 2.1 contrast ladder for the whole token set, both themes, with
+    AA / AA-large / AAA classification and a failures list.
+  - `compliance_check {jurisdiction?, feature?}` — maps a market (`us·eu·uk·au·sg·jp·global`) to the
+    regulatory anchors and guardrail components present in the system. A design coverage map, not legal advice.
+  - `compose_flow {ids[], name?}` — a dependency-resolved multi-component flow with a per-step decision
+    register and the union of tokens + anchors (build a KYC / order / onboarding surface end to end).
+  - `scaffold_test {id}` — a dependency-free, runnable contract-conformance test (tokens resolve, states
+    canonical, anchors intact, a11y contract passes, scaffold CSS tokens-only). Ships the test with the component.
+- **Ten new component contracts (55 → 65) across three new domains (11 → 14):** `lending`
+  (LoanOriginationStepper, APRDisclosure, AffordabilityCheck, RepaymentSchedule, CollectionsNotice —
+  TILA/Reg Z, ECOA/Reg B, FCA CONC, FDCPA), `wealth` (SuitabilityProfile, FeeAndConflictDisclosure,
+  PortfolioRebalanceProposal — FINRA 2111, SEC Reg BI, Form CRS, SR 11-7), and `identity` (StepUpAuth,
+  ConsentReceipt — PSD2 SCA, FFIEC, GDPR Art. 7, APPI, ISO/IEC 29184).
+- **The Agency (agency-agents) integration** — `integrations/agency-agents/`: a drop-in
+  `Regulated-Finance Design-System Engineer` specialist authored in
+  [The Agency](https://github.com/msitarzewski/agency-agents)'s open persona format and wired to eds-mcp's
+  tools, plus an example MCP config. Interoperability with attribution — no upstream files copied. (MIT,
+  by Matt Sitarzewski.)
+- Type declarations (`core.d.ts`) for all five new methods + `blocksAutonomousExecution`.
+### Changed
+- Version 1.15.0 → 1.16.0 across `tokens.json` / `components.json` / `package.json`; manifest regenerated
+  (deterministic; 48 tokens · 65 components · 14 domains). Tests extended for every new tool across
+  `test.js`, `test-mcp.js` (23 tools asserted), and `test-http.js`; `npm run validate` green.
+
 ## [1.15.0] — 2026-06-17
 ### Added
 - **Zero-dependency HTTP REST API (`http.js`)** — the same `core.js` engine over plain HTTP + JSON, so

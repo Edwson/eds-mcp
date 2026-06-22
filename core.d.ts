@@ -28,6 +28,7 @@ export interface ComponentContract {
   domain: string;
   requires?: string[];
   nonRemovable?: boolean;
+  blocksAutonomousExecution?: boolean;
 }
 
 export interface Manifest {
@@ -52,6 +53,15 @@ export interface LintIssue { severity: 'error' | 'warn'; code: string; message: 
 export interface LintResult { ok: boolean; issues: LintIssue[]; }
 export interface BundleResult { requested: string[]; order: string[]; missing: string[]; tokens: string[]; regulatory: string[]; count: number; }
 export interface MethodResult { version: string; nonNegotiables: string[]; verificationGates: string[]; canonicalStates: RenderState[]; note: string; }
+export interface A11yCheck { check: string; level: 'required' | 'contract'; pass: boolean; detail: string; }
+export interface A11yContrast { token: string; theme: Theme; against: string; ratio: number; AA: boolean; AAlarge: boolean; }
+export interface A11yAuditResult { id: string; score: { passed: number; of: number }; checks: A11yCheck[]; contrast: A11yContrast[]; summary: string; note: string; }
+export interface ContrastPair { fg: string; bg: string; ratio: number | null; AA?: boolean; AAlarge?: boolean; AAA?: boolean; note?: string; }
+export interface ContrastReport { themes: string[]; pairs: Record<string, ContrastPair[]>; failures: Array<{ theme: string; fg: string; bg: string; ratio: number }>; note: string; }
+export type Jurisdiction = 'us' | 'eu' | 'uk' | 'au' | 'sg' | 'jp' | 'global';
+export interface ComplianceResult { jurisdiction: string; feature: string | null; count: number; matchedComponents: Array<{ id: string; domain: string | null; anchors: string[]; guardrail: string }>; anchorsPresent: string[]; note: string; }
+export interface ComposeFlowResult { name: string; requested: string[]; order: string[]; missing: string[]; steps: Array<{ step: number; id: string; domain: string | null; purpose: string; whenToUse: string | null; regulatory: string[]; states: RenderState[]; requires: string[] }>; tokens: string[]; regulatory: string[]; count: number; note: string; }
+export interface ScaffoldTestResult { id: string; file: string; files: Record<string, string>; asserts: string[]; notes: string; }
 
 /** A value with an `error` is the failure shape; methods never throw across the boundary. */
 export type Result<T> = T | { error: string;[k: string]: unknown };
@@ -79,6 +89,12 @@ export interface Core {
   // generation + checks
   scaffoldComponent(id: string): Result<ScaffoldResult>;
   lintUsage(input: { tokens?: string[]; states?: string[]; css?: string }): LintResult;
+  scaffoldTest(id: string): Result<ScaffoldTestResult>;
+  // accessibility + compliance + composition
+  auditAccessibility(id: string): Result<A11yAuditResult>;
+  contrastReport(theme?: Theme): ContrastReport;
+  complianceCheck(input: { jurisdiction?: Jurisdiction; feature?: string; keywords?: string }): Result<ComplianceResult>;
+  composeFlow(input: string[] | { ids: string[]; name?: string }): Result<ComposeFlowResult>;
   // meta
   getManifest(): Manifest;
   diffSince(version: string): { consumerVersion: string; currentVersion: string; upToDate: boolean; changedFiles: string[]; checksums: Record<string, unknown> };

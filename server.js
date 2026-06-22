@@ -19,11 +19,12 @@
  * Every tool returns BOTH a text block and `structuredContent`. Failures set
  * `isError: true` rather than masquerading as data.
  *
- * TOOLS (18)
+ * TOOLS (23)
  *   reads:      list_token_groups · get_tokens · get_token · export_theme
  *               list_components · get_component · get_data_contract · get_decision_register
  *               search_components · find_by_regulation · recommend_component · bundle_components
- *   generate:   scaffold_component · lint_usage
+ *   generate:   scaffold_component · lint_usage · scaffold_test
+ *   a11y/comply: audit_accessibility · contrast_report · compliance_check · compose_flow
  *   meta:       get_manifest · diff_since · get_method · get_stats
  * RESOURCES (5) eds://tokens · eds://components · eds://manifest · eds://method · eds://regulatory
  * PROMPTS (3)   build-regulated-component · compliance-review · accessibility-audit
@@ -54,7 +55,7 @@ if (argv.includes('--help') || argv.includes('-h')) {
     `eds-mcp-server v${VERSION} — the Edwson Design System over MCP\n\n` +
     `Usage:\n  node server.js            speak MCP over stdio (default)\n` +
     `  node server.js --version  print version and exit\n  node server.js --help     show this help\n\n` +
-    `18 tools · 5 resources · 3 prompts. Docs: https://github.com/Edwson/eds-mcp\n`);
+    `23 tools · 5 resources · 3 prompts. Docs: https://github.com/Edwson/eds-mcp\n`);
   process.exit(0);
 }
 if (!manifest || !manifest.version) {
@@ -127,6 +128,27 @@ tool('lint_usage',
   { title: 'Lint a usage', description: 'Validate a proposed usage against the system: token names must resolve, render states must be canonical, and CSS must be tokens-only (no hardcoded hex/rgb, no inline styles). Returns issues by severity.', inputSchema: { tokens: z.array(z.string()).optional(), states: z.array(z.string()).optional(), css: z.string().optional() } },
   ({ tokens, states, css }) => core.lintUsage({ tokens, states, css }));
 
+/* ───────────── TOOLS · accessibility · compliance · composition ───────────── */
+tool('audit_accessibility',
+  { title: 'Audit accessibility', description: 'Static accessibility audit of a component against its contract: a11y contract present, error state declared (status in words not colour alone), every colour token defined for both themes in lock-step, reduced-motion guard, regulatory anchor — plus a per-token contrast read in both themes. Verifies the contract, not a running DOM.', inputSchema: { id: z.string() } },
+  ({ id }) => core.auditAccessibility(id));
+
+tool('contrast_report',
+  { title: 'Contrast report', description: 'The WCAG 2.1 contrast ladder for the token set in both themes (or one): foreground tokens over backgrounds with AA / AA-large / AAA classification and a failures list. The machine version of the Accessibility Lab contrast checker.', inputSchema: { theme: z.enum(['light', 'dark']).optional() } },
+  ({ theme }) => core.contrastReport(theme));
+
+tool('compliance_check',
+  { title: 'Compliance coverage check', description: 'Map a jurisdiction (us | eu | uk | au | sg | jp | global) and optional feature keywords to the regulatory anchors and guardrail components PRESENT in this design system. A coverage map for design, not legal advice.', inputSchema: { jurisdiction: z.enum(['us', 'eu', 'uk', 'au', 'sg', 'jp', 'global']).optional(), feature: z.string().optional() } },
+  ({ jurisdiction, feature }) => core.complianceCheck({ jurisdiction, feature }));
+
+tool('compose_flow',
+  { title: 'Compose a flow', description: 'Assemble a multi-component flow from a list of ids: dependency-resolved order (deps first), per-step decision register, and the union of tokens + regulatory anchors across the flow. For building a KYC / order / onboarding surface end to end.', inputSchema: { ids: z.array(z.string()), name: z.string().optional() } },
+  ({ ids, name }) => core.composeFlow({ ids, name }));
+
+tool('scaffold_test',
+  { title: 'Scaffold a conformance test', description: 'Generate a dependency-free, runnable contract-conformance smoke test for a component (tokens resolve, states canonical, regulatory anchors intact, a11y contract passes, scaffold CSS tokens-only). Ships the test discipline with the component.', inputSchema: { id: z.string() } },
+  ({ id }) => core.scaffoldTest(id));
+
 /* ───────────── TOOLS · meta ───────────── */
 tool('get_manifest', { title: 'Get manifest', description: 'Version + per-file SHA-256 checksums for sync verification.', inputSchema: {} }, () => core.getManifest());
 tool('diff_since', { title: 'Diff since version', description: 'Given a consumer version, report whether a newer contract exists so it pulls only the delta. Auto-sync primitive.', inputSchema: { version: z.string() } }, ({ version }) => core.diffSince(version));
@@ -172,4 +194,4 @@ if (typeof server.registerPrompt === 'function') {
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error(`[eds-mcp-server] ready · v${VERSION} · 18 tools · 5 resources · 3 prompts · stdio`);
+console.error(`[eds-mcp-server] ready · v${VERSION} · 23 tools · 5 resources · 3 prompts · stdio`);

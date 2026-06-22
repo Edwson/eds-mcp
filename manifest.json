@@ -1,10 +1,10 @@
 {
   "name": "edwson-design-system",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "generator": "build-manifest.js",
   "summary": {
     "tokens": 48,
-    "components": 55,
+    "components": 65,
     "domains": [
       "a11y",
       "ai",
@@ -13,10 +13,13 @@
       "b2b",
       "compliance",
       "data-eng",
+      "identity",
+      "lending",
       "ml",
       "payments",
       "platform",
-      "trading"
+      "trading",
+      "wealth"
     ],
     "componentIds": [
       "OrderTicket",
@@ -73,17 +76,27 @@
       "ReconciliationMatch",
       "PaymentRetryDunning",
       "MandateConsent",
-      "PayoutSchedule"
+      "PayoutSchedule",
+      "LoanOriginationStepper",
+      "APRDisclosure",
+      "AffordabilityCheck",
+      "RepaymentSchedule",
+      "CollectionsNotice",
+      "SuitabilityProfile",
+      "FeeAndConflictDisclosure",
+      "PortfolioRebalanceProposal",
+      "StepUpAuth",
+      "ConsentReceipt"
     ]
   },
   "files": {
     "tokens.json": {
-      "sha256": "876f29ce142972428dfecda8a8b63fcbc2f6e2bcb2dfa20ccbef1640450f8bdd",
+      "sha256": "83e085d17cb46aa1c77cb6e28ddf4f369de51df852b1f5a126e7838c313bc293",
       "bytes": 2027
     },
     "components.json": {
-      "sha256": "3347c3e8253421b96782932b72afc523364ff61341a2d63ecbcfe19140c99146",
-      "bytes": 57533
+      "sha256": "32f051f95e7e7f759915de7f36568d4e77de28075273192d965d28f8b4015ccb",
+      "bytes": 69754
     }
   },
   "sync": {
