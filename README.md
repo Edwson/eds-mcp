@@ -21,6 +21,11 @@ MCP: 23 tools · 5 resources · 3 prompts     HTTP: 24 REST endpoints · OpenAPI
 65 component contracts across 14 domains · reads + code-generation + linting + accessibility & compliance audits + flow composition + theme export
 ```
 
+> **👉 Fastest way to see what this is _for_: `npm run example`.** One plain-English requirement
+> → a shipped, compliant, tested feature, in one command — eds-mcp drives the design-system spine
+> of the whole intake → planning → PRD → R&D → QA → launch lifecycle and writes real artifacts at
+> every stage. Walkthrough + a committed sample run: [`examples/lifecycle/`](./examples/lifecycle/).
+
 ---
 
 ## Use it in one line

@@ -1,7 +1,8 @@
 import js from '@eslint/js';
 
 export default [
-  { ignores: ['node_modules/**', 'coverage/**'] },
+  // ignore generated output: scaffolded browser components + conformance-test stubs the example emits
+  { ignores: ['node_modules/**', 'coverage/**', 'examples/lifecycle/out/**', 'examples/lifecycle/sample-output/**'] },
   js.configs.recommended,
   {
     files: ['**/*.js', '**/*.mjs'],

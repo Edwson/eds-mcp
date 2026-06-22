@@ -26,7 +26,8 @@
     "test:http": "node test-http.js",
     "test:all": "npm test && npm run test:mcp && npm run test:http",
     "validate": "npm run build:manifest && npm run lint && npm run test:all",
-    "prepublishOnly": "npm run build:manifest && npm test"
+    "prepublishOnly": "npm run build:manifest && npm test",
+    "example": "node examples/lifecycle/build-feature.mjs"
   },
   "engines": {
     "node": ">=18"
@@ -95,6 +96,7 @@
     "LICENSE",
     "CHANGELOG.md",
     "README.md",
-    "integrations"
+    "integrations",
+    "examples"
   ]
 }
