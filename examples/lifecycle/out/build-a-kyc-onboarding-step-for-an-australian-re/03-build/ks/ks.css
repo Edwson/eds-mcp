@@ -1,0 +1,5 @@
+/* scoped to .ks- · tokens only · dual-theme via the system variables */
+.ks-wrap{font-family:var(--type-font);color:var(--accent2)}
+.ks-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4)}
+.ks-status{font-family:var(--type-mono);font-size:12px}
+@media (prefers-reduced-motion: reduce){.ks-wrap *{animation:none !important;transition:none !important}}

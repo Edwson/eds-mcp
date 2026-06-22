@@ -1,0 +1,16 @@
+<section class="ds-section" id="sec-loan-origination-stepper">
+  <h2 class="ds-section-title">Originate a consumer loan through disclosure and affordability gates before any commitment</h2>
+  <p class="ds-section-subtitle">Originate a consumer loan through disclosure and affordability gates before any commitment.</p>
+  <!-- Decision register (the line between a kit and a system) -->
+  <div class="ds-logic">
+    <div class="ds-logic-cell"><span class="ds-logic-k">When to use</span><p>Any flow that takes a borrower from quote to signed loan agreement.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">When not to / use instead</span><p>Servicing an existing loan — use RepaymentSchedule; collections — use CollectionsNotice.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Behaviour &amp; accessibility contract</span><p>One decision per step; APR and total cost shown in words and figures before SIGN; SIGN is the only irreversible control and is gated behind explicit consent.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Regulatory anchor</span><p>TILA / Reg Z 12 CFR 1026 (cost-of-credit disclosure) · ECOA / Reg B 12 CFR 1002 (fair lending, no prohibited-basis fields) · UK FCA CONC 4 (pre-contract disclosure)</p></div>
+  </div>
+  <div class="ds-preview"><div class="ds-preview-header">Live · LoanOriginationStepper</div>
+    <div class="ds-preview-body" style="padding:20px;display:block;">
+      <div class="los-wrap" id="los-root" aria-live="polite"><!-- rendered by losInit() --></div>
+    </div>
+  </div>
+</section>

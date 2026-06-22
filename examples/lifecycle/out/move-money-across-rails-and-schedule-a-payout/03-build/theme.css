@@ -1,0 +1,57 @@
+:root {
+  --bg: #0a0a12;
+  --surface: #12121e;
+  --surface2: #1a1c2e;
+  --border: #1e2030;
+  --border2: #2a2d42;
+  --text1: #e8eaf0;
+  --text2: #8c95a6;
+  --text3: #5a6678;
+  --accent: #6495ed;
+  --accent2: #7aabff;
+  --accentFg: #0a0a12;
+  --green: #3ecf8e;
+  --red: #ff6b78;
+  --gold: #d9bc74;
+  --purple: #c178e0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+  --density-hd: [object Object];
+  --density-md: [object Object];
+  --density-ld: [object Object];
+  --type-mono: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  --type-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --text-xs: 0.72rem;
+  --text-sm: 0.82rem;
+  --text-base: 0.92rem;
+  --text-lg: 1.1rem;
+  --text-xl: 1.4rem;
+  --text-2xl: 1.9rem;
+}
+[data-theme="light"] {
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --surface2: #f0f2f5;
+  --border: #e2e6ed;
+  --border2: #d0d5dd;
+  --text1: #1a1f36;
+  --text2: #5a6678;
+  --text3: #8c95a6;
+  --accent: #1a1f36;
+  --accent2: #3b6fd4;
+  --accentFg: #ffffff;
+  --green: #16825d;
+  --red: #c5303f;
+  --gold: #c9a959;
+  --purple: #7b1fa2;
+}

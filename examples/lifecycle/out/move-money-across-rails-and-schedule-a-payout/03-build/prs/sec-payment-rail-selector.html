@@ -1,0 +1,16 @@
+<section class="ds-section" id="sec-payment-rail-selector">
+  <h2 class="ds-section-title">Choose a money-movement rail (ACH, Wire, RTP, FedNow, SEPA, SWIFT) with live settlement speed, cost, cutoff, and reversibility</h2>
+  <p class="ds-section-subtitle">Choose a money-movement rail (ACH, Wire, RTP, FedNow, SEPA, SWIFT) with live settlement speed, cost, cutoff, and reversibility.</p>
+  <!-- Decision register (the line between a kit and a system) -->
+  <div class="ds-logic">
+    <div class="ds-logic-cell"><span class="ds-logic-k">When to use</span><p>Any send-money flow where the rail materially changes speed, cost, or finality.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">When not to / use instead</span><p>Single-rail products — show a static rail badge, not a chooser of one.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Behaviour &amp; accessibility contract</span><p>Radiogroup semantics; each rail announces speed + cost + finality; the cutoff countdown is text, never color-only.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Regulatory anchor</span><p>NACHA Operating Rules (ACH) · ISO 20022 (wire / RTP messaging) · Reg E 12 CFR 1005 (consumer EFT)</p></div>
+  </div>
+  <div class="ds-preview"><div class="ds-preview-header">Live · PaymentRailSelector</div>
+    <div class="ds-preview-body" style="padding:20px;display:block;">
+      <div class="prs-wrap" id="prs-root" aria-live="polite"><!-- rendered by prsInit() --></div>
+    </div>
+  </div>
+</section>

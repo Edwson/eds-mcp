@@ -1,0 +1,16 @@
+<section class="ds-section" id="sec-reconciliation-match">
+  <h2 class="ds-section-title">Match a bank or processor statement line against a ledger entry — matched, unmatched, or exception — with confidence and a manual-match action</h2>
+  <p class="ds-section-subtitle">Match a bank or processor statement line against a ledger entry — matched, unmatched, or exception — with confidence and a manual-match action.</p>
+  <!-- Decision register (the line between a kit and a system) -->
+  <div class="ds-logic">
+    <div class="ds-logic-cell"><span class="ds-logic-k">When to use</span><p>Treasury, ops, or finance surfaces reconciling money movement to the ledger.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">When not to / use instead</span><p>Real-time pre-trade checks — this is post-settlement reconciliation, not an execution gate.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Behaviour &amp; accessibility contract</span><p>Match state carries a text label plus icon, never color alone; manual-match is keyboard-operable and reversible with an audit note.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Regulatory anchor</span><p>SOC 1 / ICFR (reconciliation control) · ISO 20022 camt.053 (bank statement) · SEC 17a-4 (audit-trail retention where applicable)</p></div>
+  </div>
+  <div class="ds-preview"><div class="ds-preview-header">Live · ReconciliationMatch</div>
+    <div class="ds-preview-body" style="padding:20px;display:block;">
+      <div class="rm-wrap" id="rm-root" aria-live="polite"><!-- rendered by rmInit() --></div>
+    </div>
+  </div>
+</section>

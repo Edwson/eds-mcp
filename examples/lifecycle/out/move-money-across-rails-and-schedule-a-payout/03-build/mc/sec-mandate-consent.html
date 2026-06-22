@@ -1,0 +1,16 @@
+<section class="ds-section" id="sec-mandate-consent">
+  <h2 class="ds-section-title">Capture and display a debit authorization (ACH authorization / SEPA mandate): payee, amount cap, frequency, and a revocation path</h2>
+  <p class="ds-section-subtitle">Capture and display a debit authorization (ACH authorization / SEPA mandate): payee, amount cap, frequency, and a revocation path.</p>
+  <!-- Decision register (the line between a kit and a system) -->
+  <div class="ds-logic">
+    <div class="ds-logic-cell"><span class="ds-logic-k">When to use</span><p>Setting up any pull-based recurring debit where the payer must authorize in advance.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">When not to / use instead</span><p>Push payments the user initiates each time — there is no standing mandate to capture.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Behaviour &amp; accessibility contract</span><p>The authorization text is readable before consent; revoke is as easy to find as grant; consent state is announced.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Regulatory anchor</span><p>NACHA authorization rules (WEB / PPD / CCD) · SEPA Direct Debit Mandate (Rulebook) · Reg E preauthorized transfers (12 CFR 1005.10)</p></div>
+  </div>
+  <div class="ds-preview"><div class="ds-preview-header">Live · MandateConsent</div>
+    <div class="ds-preview-body" style="padding:20px;display:block;">
+      <div class="mc-wrap" id="mc-root" aria-live="polite"><!-- rendered by mcInit() --></div>
+    </div>
+  </div>
+</section>

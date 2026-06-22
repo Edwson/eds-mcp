@@ -1,0 +1,5 @@
+/* scoped to .los- · tokens only · dual-theme via the system variables */
+.los-wrap{font-family:var(--type-font);color:var(--text1)}
+.los-panel{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4)}
+.los-status{font-family:var(--type-mono);font-size:12px}
+@media (prefers-reduced-motion: reduce){.los-wrap *{animation:none !important;transition:none !important}}

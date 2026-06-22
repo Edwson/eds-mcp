@@ -1,0 +1,16 @@
+<section class="ds-section" id="sec-audit-trail">
+  <h2 class="ds-section-title">Append-only, hash-chained event log for compliance evidence (sign-offs, overrides, disclosures shown)</h2>
+  <p class="ds-section-subtitle">Append-only, hash-chained event log for compliance evidence (sign-offs, overrides, disclosures shown).</p>
+  <!-- Decision register (the line between a kit and a system) -->
+  <div class="ds-logic">
+    <div class="ds-logic-cell"><span class="ds-logic-k">When to use</span><p>Any action that must be defensible later: human sign-off, AI override, KYC step, disclosure acknowledgement.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">When not to / use instead</span><p>Never allow edit or delete of past entries; never omit the actor or the timestamp.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Behaviour &amp; accessibility contract</span><p>The log is a labelled list; new entries are announced politely; timestamps are machine-readable.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Regulatory anchor</span><p>SEC Rule 17a-4(f) (append-only retention) · SR 11-7</p></div>
+  </div>
+  <div class="ds-preview"><div class="ds-preview-header">Live · AuditTrail</div>
+    <div class="ds-preview-body" style="padding:20px;display:block;">
+      <div class="at-wrap" id="at-root" aria-live="polite"><!-- rendered by atInit() --></div>
+    </div>
+  </div>
+</section>

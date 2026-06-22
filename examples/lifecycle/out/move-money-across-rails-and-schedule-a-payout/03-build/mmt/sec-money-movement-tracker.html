@@ -1,0 +1,16 @@
+<section class="ds-section" id="sec-money-movement-tracker">
+  <h2 class="ds-section-title">Show a payment's lifecycle — initiated, risk hold, clearing, settled or returned — with a reversibility window and return code</h2>
+  <p class="ds-section-subtitle">Show a payment's lifecycle — initiated, risk hold, clearing, settled or returned — with a reversibility window and return code.</p>
+  <!-- Decision register (the line between a kit and a system) -->
+  <div class="ds-logic">
+    <div class="ds-logic-cell"><span class="ds-logic-k">When to use</span><p>After a payment is submitted, on any status surface the payer or ops team sees.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">When not to / use instead</span><p>Instant irreversible rails with no intermediate states — a single settled badge is honest; don't fake stages.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Behaviour &amp; accessibility contract</span><p>Status is a live region; the stage list is an ordered list with aria-current; return codes link to plain-language explanations.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Regulatory anchor</span><p>NACHA return codes (R01–R85) · Reg E error resolution (12 CFR 1005.11) · ISO 20022 pacs.002 (payment status report)</p></div>
+  </div>
+  <div class="ds-preview"><div class="ds-preview-header">Live · MoneyMovementTracker</div>
+    <div class="ds-preview-body" style="padding:20px;display:block;">
+      <div class="mmt-wrap" id="mmt-root" aria-live="polite"><!-- rendered by mmtInit() --></div>
+    </div>
+  </div>
+</section>

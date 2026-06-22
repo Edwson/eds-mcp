@@ -1,0 +1,5 @@
+/* scoped to .fqt- · tokens only · dual-theme via the system variables */
+.fqt-wrap{font-family:var(--type-font);color:var(--text1)}
+.fqt-panel{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4)}
+.fqt-status{font-family:var(--type-mono);font-size:12px}
+@media (prefers-reduced-motion: reduce){.fqt-wrap *{animation:none !important;transition:none !important}}

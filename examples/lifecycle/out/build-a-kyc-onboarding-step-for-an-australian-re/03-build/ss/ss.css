@@ -1,0 +1,5 @@
+/* scoped to .ss- · tokens only · dual-theme via the system variables */
+.ss-wrap{font-family:var(--type-font);color:var(--surface)}
+.ss-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4)}
+.ss-status{font-family:var(--type-mono);font-size:12px}
+@media (prefers-reduced-motion: reduce){.ss-wrap *{animation:none !important;transition:none !important}}

@@ -1,0 +1,5 @@
+/* scoped to .rm- · tokens only · dual-theme via the system variables */
+.rm-wrap{font-family:var(--type-font);color:var(--green)}
+.rm-panel{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:var(--space-3)}
+.rm-status{font-family:var(--type-mono);font-size:12px}
+@media (prefers-reduced-motion: reduce){.rm-wrap *{animation:none !important;transition:none !important}}

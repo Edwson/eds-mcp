@@ -1,0 +1,5 @@
+/* scoped to .ac- · tokens only · dual-theme via the system variables */
+.ac-wrap{font-family:var(--type-font);color:var(--text1)}
+.ac-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4)}
+.ac-status{font-family:var(--type-mono);font-size:12px}
+@media (prefers-reduced-motion: reduce){.ac-wrap *{animation:none !important;transition:none !important}}

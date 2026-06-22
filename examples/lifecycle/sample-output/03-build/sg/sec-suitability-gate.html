@@ -1,0 +1,16 @@
+<section class="ds-section" id="sec-suitability-gate">
+  <h2 class="ds-section-title">Gate access to a financial product behind a FINRA 2111 suitability assessment before the product is shown</h2>
+  <p class="ds-section-subtitle">Gate access to a financial product behind a FINRA 2111 suitability assessment before the product is shown.</p>
+  <!-- Decision register (the line between a kit and a system) -->
+  <div class="ds-logic">
+    <div class="ds-logic-cell"><span class="ds-logic-k">When to use</span><p>Before exposing any product whose suitability depends on the customer's profile.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">When not to / use instead</span><p>Not for products with no suitability obligation — render the product directly.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Behaviour &amp; accessibility contract</span><p>Gate outcome is announced; the blocking reason is text and focusable, not a colour state.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Regulatory anchor</span><p>FINRA Rule 2111 (suitability) · SEC Reg BI</p></div>
+  </div>
+  <div class="ds-preview"><div class="ds-preview-header">Live · SuitabilityGate</div>
+    <div class="ds-preview-body" style="padding:20px;display:block;">
+      <div class="sg-wrap" id="sg-root" aria-live="polite"><!-- rendered by sgInit() --></div>
+    </div>
+  </div>
+</section>

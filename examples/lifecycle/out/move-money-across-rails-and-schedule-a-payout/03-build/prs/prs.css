@@ -1,0 +1,5 @@
+/* scoped to .prs- · tokens only · dual-theme via the system variables */
+.prs-wrap{font-family:var(--type-font);color:var(--text1)}
+.prs-panel{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4)}
+.prs-status{font-family:var(--type-mono);font-size:12px}
+@media (prefers-reduced-motion: reduce){.prs-wrap *{animation:none !important;transition:none !important}}

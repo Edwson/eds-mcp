@@ -1,0 +1,16 @@
+<section class="ds-section" id="sec-sanctions-screen">
+  <h2 class="ds-section-title">Screen a party against OFAC and PEP lists and surface scored potential matches for analyst review</h2>
+  <p class="ds-section-subtitle">Screen a party against OFAC and PEP lists and surface scored potential matches for analyst review.</p>
+  <!-- Decision register (the line between a kit and a system) -->
+  <div class="ds-logic">
+    <div class="ds-logic-cell"><span class="ds-logic-k">When to use</span><p>During onboarding or transaction monitoring wherever a counterparty must be sanctions-screened.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">When not to / use instead</span><p>Not a substitute for full KYC identity capture — use KycStepper for that.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Behaviour &amp; accessibility contract</span><p>Each match exposes its score and list source as text; clear/hit states announced via live region.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Regulatory anchor</span><p>OFAC 31 CFR Part 501 · FATF Rec 6 (targeted financial sanctions)</p></div>
+  </div>
+  <div class="ds-preview"><div class="ds-preview-header">Live · SanctionsScreen</div>
+    <div class="ds-preview-body" style="padding:20px;display:block;">
+      <div class="ss-wrap" id="ss-root" aria-live="polite"><!-- rendered by ssInit() --></div>
+    </div>
+  </div>
+</section>

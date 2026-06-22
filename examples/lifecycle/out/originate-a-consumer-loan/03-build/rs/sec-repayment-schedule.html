@@ -1,0 +1,16 @@
+<section class="ds-section" id="sec-repayment-schedule">
+  <h2 class="ds-section-title">Render the full amortisation schedule — principal, interest, balance per period</h2>
+  <p class="ds-section-subtitle">Render the full amortisation schedule — principal, interest, balance per period.</p>
+  <!-- Decision register (the line between a kit and a system) -->
+  <div class="ds-logic">
+    <div class="ds-logic-cell"><span class="ds-logic-k">When to use</span><p>Loan agreement review and ongoing servicing.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">When not to / use instead</span><p>A single next-payment reminder — that is a lighter notice, not the full table.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Behaviour &amp; accessibility contract</span><p>Scrollable data table with row/column headers; running balance announced; current period marked in text, not colour alone.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Regulatory anchor</span><p>TILA / Reg Z 12 CFR 1026.18(g) (payment schedule)</p></div>
+  </div>
+  <div class="ds-preview"><div class="ds-preview-header">Live · RepaymentSchedule</div>
+    <div class="ds-preview-body" style="padding:20px;display:block;">
+      <div class="rs-wrap" id="rs-root" aria-live="polite"><!-- rendered by rsInit() --></div>
+    </div>
+  </div>
+</section>

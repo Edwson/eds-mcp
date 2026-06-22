@@ -1,0 +1,16 @@
+<section class="ds-section" id="sec-fx-quote-ticket">
+  <h2 class="ds-section-title">Quote a cross-currency transfer: you-send / they-receive, indicative rate, fee, mid-market markup, and a rate-expiry timer</h2>
+  <p class="ds-section-subtitle">Quote a cross-currency transfer: you-send / they-receive, indicative rate, fee, mid-market markup, and a rate-expiry timer.</p>
+  <!-- Decision register (the line between a kit and a system) -->
+  <div class="ds-logic">
+    <div class="ds-logic-cell"><span class="ds-logic-k">When to use</span><p>Any multi-currency send where rate and fee must be disclosed before commit.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">When not to / use instead</span><p>Same-currency transfers — no FX surface, and never invent a rate.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Behaviour &amp; accessibility contract</span><p>Rate-expiry is counted-down text with aria-live; the markup over mid-market is stated explicitly, never hidden inside the rate.</p></div>
+    <div class="ds-logic-cell"><span class="ds-logic-k">Regulatory anchor</span><p>Reg E remittance rule (12 CFR 1005 Subpart B) · Consumer FX transparency (mid-market disclosure) · PSD2 (EEA payment transparency)</p></div>
+  </div>
+  <div class="ds-preview"><div class="ds-preview-header">Live · FxQuoteTicket</div>
+    <div class="ds-preview-body" style="padding:20px;display:block;">
+      <div class="fqt-wrap" id="fqt-root" aria-live="polite"><!-- rendered by fqtInit() --></div>
+    </div>
+  </div>
+</section>
