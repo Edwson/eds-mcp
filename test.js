@@ -131,5 +131,39 @@ const stt = core.scaffoldTest(ids[0]);
 ok(stt && stt.file && stt.files[stt.file] && stt.files[stt.file].includes(ids[0]) && /assert/.test(stt.files[stt.file]), 'scaffold_test emits a runnable conformance test');
 ok(core.scaffoldTest('NoSuchComponent').error, 'scaffold_test reports an error for an unknown id');
 
+console.log('consumer pack');
+const CONSUMER = load('consumer.json');
+const ccore = createCore({ tokens: TOKENS, components: { components: COMPONENTS }, manifest: MANIFEST, consumer: CONSUMER });
+ok(Array.isArray(CONSUMER.components) && CONSUMER.components.length === CONSUMER.count, `bundled snapshot is self-consistent (${CONSUMER.count} entries)`);
+ok(CONSUMER.components.every((c) => c.id && c.name && c.domain && c.anchor && c.url), 'every consumer entry carries id, name, domain, anchor, url');
+ok(Array.isArray(CONSUMER.agentProtocol) && CONSUMER.agentProtocol.length === 7, 'agentProtocol is the seven-step read path');
+ok(CONSUMER.agentProtocol[CONSUMER.agentProtocol.length - 1].name === 'gate-to-human', 'the read path ends at a human gate');
+{
+  const ids = new Set(CONSUMER.components.map((c) => c.id));
+  const refs = CONSUMER.bundles.flatMap((b) => [b.if, ...(b.requires || [])]);
+  ok(refs.every((r) => ids.has(r)), 'every bundle id exists in the catalogue');
+}
+ok(CONSUMER.hardRules.every((r) => r.id && r.rule && r.anchor), 'every hard rule carries id, rule and anchor');
+{
+  const list = ccore.listConsumerComponents();
+  ok(list.count === CONSUMER.count, `list_consumer_components returns all ${CONSUMER.count}`);
+  const ai = ccore.listConsumerComponents('ai');
+  ok(ai.count >= 20, `ai domain lists ${ai.count} agent surfaces`);
+  ok(ccore.listConsumerComponents('nope').error, 'unknown domain reports an error with valid domains');
+  const pay = ccore.getConsumerComponent('paywall');
+  ok(pay.id === 'paywall' && pay.requires.some((b) => (b.requires || []).includes('cancellation')), 'paywall arrives with its cancellation obligation attached');
+  ok(ccore.getConsumerComponent('NoSuch').error, 'unknown consumer id reports an error');
+  const coppa = ccore.findConsumerByAnchor('COPPA');
+  ok(coppa.count >= 1 && coppa.hardRules.length >= 1, 'anchor search "COPPA" returns entries + the hard rule');
+  const sr = ccore.searchConsumerComponents('cancel subscription');
+  ok(sr.count >= 1 && sr.results[0].id, 'keyword search finds cancellation surfaces');
+  const proto = ccore.getAgentProtocol();
+  ok(proto.agentProtocol.length === 7 && proto.hardRules.length >= 7, 'get_agent_protocol serves the read path + hard rules');
+  const stats = ccore.getStats();
+  ok(stats.consumer && stats.consumer.components === CONSUMER.count, 'getStats reports the consumer pack');
+  ok(core.getStats().consumer === undefined, 'core without the pack stays unchanged (adapter is optional)');
+  ok(createCore({ tokens: TOKENS, components: { components: COMPONENTS } }).listConsumerComponents().error, 'pack-less core degrades gracefully with a hint');
+}
+
 console.log(fails === 0 ? '\nPASS — contract valid, in sync, and the engine behaves.' : `\nFAIL — ${fails} check(s) failed.`);
 process.exit(fails === 0 ? 0 : 1);

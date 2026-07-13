@@ -40,7 +40,8 @@ export interface Manifest {
 
 export interface CoreData {
   tokens: Tokens;
-  components: { components: Record<string, ComponentContract> } | Record<string, ComponentContract>;
+  components: { components: Record<string, ComponentContract>   consumer?: unknown;
+} | Record<string, ComponentContract>;
   manifest?: Manifest;
 }
 
@@ -95,6 +96,13 @@ export interface Core {
   contrastReport(theme?: Theme): ContrastReport;
   complianceCheck(input: { jurisdiction?: Jurisdiction; feature?: string; keywords?: string }): Result<ComplianceResult>;
   composeFlow(input: string[] | { ids: string[]; name?: string }): Result<ComposeFlowResult>;
+  // consumer pack (optional second system)
+  listConsumerComponents(domain?: string): Result<{ system: string; version: string; domain: string | null; count: number; domains: Record<string, number>; components: ConsumerSummary[] }>;
+  getConsumerComponent(id: string): Result<ConsumerComponent & { requires: ConsumerBundle[]; requiredBy: string[]; protocolNote: string }>;
+  searchConsumerComponents(query: string): Result<{ query: string; count: number; results: Array<ConsumerSummary & { score: number }> }>;
+  findConsumerByAnchor(rule: string): Result<{ rule: string; count: number; results: ConsumerSummary[]; hardRules: ConsumerHardRule[]; note: string }>;
+  getConsumerBundles(id?: string): Result<{ count?: number; bundles?: ConsumerBundle[]; id?: string; requires?: ConsumerBundle[]; note?: string }>;
+  getAgentProtocol(): Result<{ system: string; version: string; agentProtocol: ConsumerProtocolStep[]; hardRules: ConsumerHardRule[]; source: Record<string, string>; note: string }>;
   // meta
   getManifest(): Manifest;
   diffSince(version: string): { consumerVersion: string; currentVersion: string; upToDate: boolean; changedFiles: string[]; checksums: Record<string, unknown> };
@@ -103,6 +111,12 @@ export interface Core {
   summarize(id: string, c: ComponentContract): unknown;
   domainCounts(): Record<string, number>;
 }
+
+export interface ConsumerSummary { id: string; name: string; domain: string; anchor: string; url: string }
+export interface ConsumerComponent extends ConsumerSummary { summary: string }
+export interface ConsumerBundle { if: string; requires: string[]; reason: string }
+export interface ConsumerHardRule { id: string; rule: string; anchor: string }
+export interface ConsumerProtocolStep { step: number; name: string; how: string }
 
 export function createCore(data: CoreData): Core;
 export const CANON_STATES: RenderState[];

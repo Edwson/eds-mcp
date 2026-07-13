@@ -519,6 +519,65 @@ console.log('PASS ' + id + ' — contract conformance');
     };
   }
 
+  /* ---------- consumer pack (optional second system: the Consumer Design System) ---------- */
+  const CONSUMER = data.consumer || null;
+  const noPack = () => ({ error: 'consumer pack not loaded', hint: 'construct the core with { consumer } (bundled consumer.json), or fetch the live contracts at https://edwson.com/cds/components.json' });
+  function consumerSummary(c) {
+    return { id: c.id, name: c.name, domain: c.domain, anchor: c.anchor, url: c.url };
+  }
+  // List consumer components, optionally filtered by domain.
+  function listConsumerComponents(domain) {
+    if (!CONSUMER) return noPack();
+    const all = CONSUMER.components || [];
+    const items = domain ? all.filter((c) => c.domain === domain) : all;
+    if (domain && items.length === 0) return { error: `unknown domain: ${domain}`, domains: CONSUMER.domains || [] };
+    return { system: CONSUMER.name, version: CONSUMER.version, domain: domain || null, count: items.length, domains: CONSUMER.counts || {}, components: items.map(consumerSummary) };
+  }
+  // One consumer entry, with any bundle obligations attached.
+  function getConsumerComponent(id) {
+    if (!CONSUMER) return noPack();
+    const c = (CONSUMER.components || []).find((x) => x.id === id);
+    if (!c) return { error: `unknown consumer component: ${id}`, hint: 'call list_consumer_components for valid ids' };
+    const requires = (CONSUMER.bundles || []).filter((b) => b.if === id);
+    const requiredBy = (CONSUMER.bundles || []).filter((b) => (b.requires || []).includes(id)).map((b) => b.if);
+    return { ...c, requires, requiredBy, protocolNote: 'the when-not-to cell of the register at `url` is binding; the anchor is a constraint, not a footnote' };
+  }
+  // Keyword search across consumer names, summaries, domains and anchors.
+  function searchConsumerComponents(query) {
+    if (!CONSUMER) return noPack();
+    const q = String(query || '').toLowerCase().trim();
+    const terms = q.split(/\s+/).filter(Boolean);
+    const scored = (CONSUMER.components || []).map((c) => {
+      const hay = `${c.id} ${c.name} ${c.domain} ${c.summary} ${c.anchor}`.toLowerCase();
+      const score = terms.reduce((n, t) => n + (hay.includes(t) ? 1 : 0), 0);
+      return { c, score };
+    }).filter((r) => r.score > 0).sort((a, b) => b.score - a.score);
+    return { query, count: scored.length, results: scored.slice(0, 12).map((r) => ({ ...consumerSummary(r.c), score: r.score })) };
+  }
+  // Regulation-first discovery: which consumer components answer to a framework?
+  function findConsumerByAnchor(rule) {
+    if (!CONSUMER) return noPack();
+    const q = String(rule || '').toLowerCase().trim();
+    if (!q) return { error: 'rule required', example: 'COPPA, GDPR Art 7, FTC, WCAG 1.4.1, EU AI Act' };
+    const results = (CONSUMER.components || []).filter((c) => (c.anchor || '').toLowerCase().includes(q)).map(consumerSummary);
+    const hardRules = (CONSUMER.hardRules || []).filter((r) => (`${r.anchor} ${r.rule} ${r.id}`).toLowerCase().includes(q));
+    return { rule, count: results.length, results, hardRules, note: 'start from the rule, not the widget' };
+  }
+  // Bundled-by-contract pairs — all of them, or the obligations of one id.
+  function getConsumerBundles(id) {
+    if (!CONSUMER) return noPack();
+    const all = CONSUMER.bundles || [];
+    if (!id) return { count: all.length, bundles: all };
+    const requires = all.filter((b) => b.if === id);
+    return { id, requires, note: requires.length ? 'include these unprompted — the dependency is data, not tribal knowledge' : 'no bundle obligations for this id' };
+  }
+  // The agent reading logic itself: read path + hard rules, machine-carried.
+  function getAgentProtocol() {
+    if (!CONSUMER) return noPack();
+    return { system: CONSUMER.name, version: CONSUMER.version, agentProtocol: CONSUMER.agentProtocol || [], hardRules: CONSUMER.hardRules || [], source: CONSUMER.source || {},
+      note: 'steps are ordered; hardRules may BLOCK a build — a block is a refusal with a citation, not a warning' };
+  }
+
   /* ---------- meta ---------- */
   function getManifest() { return MANIFEST; }
   function diffSince(version) {
@@ -534,8 +593,10 @@ console.log('PASS ' + id + ' — contract conformance');
     const tokenCount = Object.keys(TOKENS.color ? TOKENS.color.light || {} : {}).length * 2
       + Object.keys(TOKENS.space || {}).length + Object.keys(TOKENS.radius || {}).length
       + Object.keys((TOKENS.type || {}).scale || {}).length + Object.keys(TOKENS.density || {}).length;
-    return { version: VERSION, components: Object.keys(COMPONENTS).length, domains: domainCounts(),
+    const base = { version: VERSION, components: Object.keys(COMPONENTS).length, domains: domainCounts(),
       regulatoryFrameworks: reg.length, tokens: tokenCount, canonicalStates: CANON_STATES };
+    if (CONSUMER) base.consumer = { system: CONSUMER.name, version: CONSUMER.version, components: (CONSUMER.components || []).length, domains: CONSUMER.counts || {}, bundles: (CONSUMER.bundles || []).length, hardRules: (CONSUMER.hardRules || []).length };
+    return base;
   }
 
   return {
@@ -548,6 +609,8 @@ console.log('PASS ' + id + ' — contract conformance');
     scaffoldComponent, lintUsage, scaffoldTest,
     // accessibility + compliance + composition
     auditAccessibility, contrastReport, complianceCheck, composeFlow,
+    // consumer pack
+    listConsumerComponents, getConsumerComponent, searchConsumerComponents, findConsumerByAnchor, getConsumerBundles, getAgentProtocol,
     // meta
     getManifest, diffSince, getMethod, getStats
   };

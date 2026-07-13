@@ -16,9 +16,12 @@ const load = (f) => JSON.parse(readFileSync(join(here, f), 'utf8'));
 export function loadCore() {
   let manifest = {};
   try { manifest = load('manifest.json'); } catch { /* run `npm run build:manifest` first */ }
+  let consumer = null;
+  try { consumer = load('consumer.json'); } catch { /* consumer pack is optional */ }
   return createCore({
     tokens: load('tokens.json'),
     components: load('components.json'),
     manifest,
+    consumer,
   });
 }

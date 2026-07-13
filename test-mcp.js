@@ -31,7 +31,7 @@ try {
 
   console.log('discovery');
   const tools = (await client.listTools()).tools;
-  ok(tools.length === 23, `lists 23 tools (got ${tools.length})`);
+  ok(tools.length === 29, `lists 29 tools (got ${tools.length})`);
   ok(tools.every((t) => t.inputSchema && typeof t.description === 'string'), 'every tool advertises a description + input schema');
   const resources = (await client.listResources()).resources;
   ok(resources.length === 5, `lists 5 resources (got ${resources.length})`);
@@ -69,6 +69,14 @@ try {
   ok(badResult.isError === true, 'a bad request sets isError on the response');
   const badJur = await client.callTool({ name: 'compliance_check', arguments: { jurisdiction: 'zz' } });
   ok(badJur.isError === true, 'compliance_check rejects an unknown jurisdiction with isError');
+
+  console.log('consumer pack');
+  const proto = sc(await client.callTool({ name: 'get_agent_protocol', arguments: {} }));
+  ok(proto.agentProtocol && proto.agentProtocol.length === 7, 'get_agent_protocol serves the seven-step read path over the wire');
+  const cpay = sc(await client.callTool({ name: 'get_consumer_component', arguments: { id: 'paywall' } }));
+  ok(cpay.id === 'paywall' && Array.isArray(cpay.requires), 'get_consumer_component returns paywall with bundle obligations');
+  const canchor = sc(await client.callTool({ name: 'find_consumer_by_anchor', arguments: { rule: 'COPPA' } }));
+  ok(canchor.count >= 1, 'find_consumer_by_anchor answers "COPPA" over the wire');
 
   console.log('resources + prompts');
   const method = JSON.parse((await client.readResource({ uri: 'eds://method' })).contents[0].text);

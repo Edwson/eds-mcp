@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const FILES = ['tokens.json', 'components.json'];
+const FILES = ['tokens.json', 'components.json', 'consumer.json'];
 
 function sha256(buf) {
   return createHash('sha256').update(buf).digest('hex');
@@ -47,6 +47,12 @@ const componentCount = Object.keys(components.components || {}).length;
 const componentIds = Object.keys(components.components || {});
 const domains = [...new Set(Object.values(components.components || {}).map((c) => c.domain).filter(Boolean))].sort();
 
+let consumerSummary = null;
+try {
+  const consumer = JSON.parse(readFileSync(join(here, 'consumer.json'), 'utf8'));
+  consumerSummary = { system: consumer.name, version: consumer.version, components: (consumer.components || []).length, domains: Object.keys(consumer.counts || {}).length, bundles: (consumer.bundles || []).length, hardRules: (consumer.hardRules || []).length };
+} catch { /* consumer pack optional */ }
+
 const manifest = {
   name: 'edwson-design-system',
   version,
@@ -54,7 +60,7 @@ const manifest = {
   // produces no diff (CI asserts `git diff --exit-code manifest.json`). Change is detected
   // by per-file sha256 + the SemVer `version`, not by time.
   generator: 'build-manifest.js',
-  summary: { tokens: tokenCount, components: componentCount, domains, componentIds },
+  summary: { tokens: tokenCount, components: componentCount, domains, componentIds, consumer: consumerSummary },
   files,
   sync: {
     strategy: 'checksum-diff',

@@ -1,0 +1,1188 @@
+{
+  "name": "consumer-design-system",
+  "version": "1.4.0",
+  "source": {
+    "catalogue": "https://edwson.com/consumer-design-system.html",
+    "components": "https://edwson.com/cds/components.json",
+    "tokens": "https://edwson.com/cds/tokens.json",
+    "agentBrief": "https://edwson.com/cds/AGENTS.md",
+    "note": "Bundled snapshot for deterministic offline use. The live files above are canonical; refresh this file from them — never hand-edit."
+  },
+  "count": 118,
+  "domains": [
+    "ai",
+    "commerce",
+    "core",
+    "foundations",
+    "growth",
+    "media",
+    "navigation",
+    "onboarding",
+    "patterns",
+    "social",
+    "trust"
+  ],
+  "counts": {
+    "foundations": 7,
+    "core": 29,
+    "navigation": 6,
+    "onboarding": 8,
+    "commerce": 10,
+    "social": 8,
+    "media": 6,
+    "growth": 7,
+    "trust": 8,
+    "ai": 22,
+    "patterns": 7
+  },
+  "agentProtocol": [
+    {
+      "step": 0,
+      "name": "discover",
+      "how": "head link rel=alternate (application/json), Dataset JSON-LD, or site llms.txt all point here"
+    },
+    {
+      "step": 1,
+      "name": "fetch-index",
+      "how": "GET this file; it is generated from the page's own navigation and cannot drift — never hand-edit, refetch"
+    },
+    {
+      "step": 2,
+      "name": "select",
+      "how": "choose entries by domain + summary; a component not in this index does not exist — do not invent"
+    },
+    {
+      "step": 3,
+      "name": "read-register",
+      "how": "follow entry.url to the four-cell register; the when-not-to cell is binding and the anchor is a constraint, not a footnote"
+    },
+    {
+      "step": 4,
+      "name": "resolve-bundles-and-rules",
+      "how": "auto-include bundles[]; hardRules[] may BLOCK the build — a block is a refusal with a citation, not a warning"
+    },
+    {
+      "step": 5,
+      "name": "build-from-tokens",
+      "how": "GET cds/tokens.json and use token slices only — never raw hex; one spring curve; everything gated behind prefers-reduced-motion; 44px targets"
+    },
+    {
+      "step": 6,
+      "name": "gate-to-human",
+      "how": "irreversible actions (money, sends, permissions) stop at a confirmation gate that authorises an exact payload, not a plan; log effects and blocked steps with the rule that blocked them"
+    }
+  ],
+  "bundles": [
+    {
+      "if": "paywall",
+      "requires": [
+        "cancellation"
+      ],
+      "reason": "the exit ships with the entrance — FTC click-to-cancel"
+    },
+    {
+      "if": "feed-post",
+      "requires": [
+        "report"
+      ],
+      "reason": "user-generated content does not ship without report & block — App Store 1.2, EU DSA Art 16"
+    },
+    {
+      "if": "comments",
+      "requires": [
+        "report"
+      ],
+      "reason": "same UGC rule as feed-post"
+    },
+    {
+      "if": "checkout",
+      "requires": [
+        "order-tracking"
+      ],
+      "reason": "post-purchase truth is part of the purchase"
+    },
+    {
+      "if": "live",
+      "requires": [
+        "captions"
+      ],
+      "reason": "live video carries live captions — WCAG 1.2.4"
+    },
+    {
+      "if": "agent-confirm",
+      "requires": [
+        "agent-trace"
+      ],
+      "reason": "an approval without an audit trail is theatre — EU AI Act Art 12"
+    },
+    {
+      "if": "agent-grants",
+      "requires": [
+        "agent-trace"
+      ],
+      "reason": "every grant change is logged — permissions and audit are one system"
+    }
+  ],
+  "hardRules": [
+    {
+      "id": "consent-symmetry",
+      "rule": "reject-all and accept-all are visual equals; non-essential defaults off",
+      "anchor": "GDPR Art 7 · EU DSA Art 25"
+    },
+    {
+      "id": "coppa-child-directed",
+      "rule": "child-directed flows: neutral age screening, no personalised ads, data minimisation",
+      "anchor": "COPPA · 16 CFR Part 312"
+    },
+    {
+      "id": "live-truthfulness",
+      "rule": "LIVE styling on non-live content is a violation, not a style choice",
+      "anchor": "FTC deception standard"
+    },
+    {
+      "id": "all-in-pricing",
+      "rule": "no fee appears for the first time at the pay step",
+      "anchor": "FTC junk-fee rule"
+    },
+    {
+      "id": "click-to-cancel",
+      "rule": "cancelling takes no more effort than subscribing, in-app, end to end",
+      "anchor": "FTC Negative Option Rule"
+    },
+    {
+      "id": "no-dark-patterns",
+      "rule": "no asymmetric consent, guilt copy, fake scarcity, camouflaged ads, or retention mazes; conflicts escalate to the human",
+      "anchor": "EU DSA Art 25 · FTC"
+    },
+    {
+      "id": "human-signs",
+      "rule": "agent surfaces: irreversible actions require an exact-payload confirmation gate; abstention routes to a human",
+      "anchor": "EU AI Act Art 14 · SR 11-7 discipline"
+    }
+  ],
+  "components": [
+    {
+      "id": "color",
+      "name": "Color",
+      "domain": "foundations",
+      "summary": "A near-neutral canvas with one working accent. Consumer color earns attention it doesn't demand: semantic colors mean the same thing on every screen, and no state is ever encoded by hue alone.",
+      "anchor": "WCAG 2.2 · 1.4.3 contrast (minimum) and 1.4.1 use of color; HIG Color (semantic, adaptive colors); Material 3 color roles.",
+      "url": "https://edwson.com/consumer-design-system.html#color"
+    },
+    {
+      "id": "typography",
+      "name": "Typography",
+      "domain": "foundations",
+      "summary": "Two voices: a tight display face for moments, the native system stack for everything else. Consumer type is generous — bigger minimums, looser leading, tighter tracking as size grows.",
+      "anchor": "HIG Typography (Dynamic Type); Material 3 type scale; WCAG 2.2 · 1.4.4 resize text, 1.4.10 reflow, 1.4.12 text spacing.",
+      "url": "https://edwson.com/consumer-design-system.html#typography"
+    },
+    {
+      "id": "spacing",
+      "name": "Spacing & Layout",
+      "domain": "foundations",
+      "summary": "A 4px base grid with an 8-step scale. White space is the cheapest premium material there is — this system spends it deliberately.",
+      "anchor": "HIG Layout (44pt targets, safe areas); Material 3 4dp grid; WCAG 2.2 · 2.5.8 target size (minimum).",
+      "url": "https://edwson.com/consumer-design-system.html#spacing"
+    },
+    {
+      "id": "materials",
+      "name": "Materials & Elevation",
+      "domain": "foundations",
+      "summary": "Three levels of shadow and one glass. Elevation answers exactly one question — what is above what — so it is spent like money.",
+      "anchor": "HIG Materials (vibrancy, translucency); Material 3 elevation; WCAG 2.2 · 1.4.3 contrast over variable backgrounds.",
+      "url": "https://edwson.com/consumer-design-system.html#materials"
+    },
+    {
+      "id": "motion",
+      "name": "Motion",
+      "domain": "foundations",
+      "summary": "One spring, three durations. Motion in this system is spatial reasoning — it tells you where things came from and where they went. Anything that only decorates gets cut.",
+      "anchor": "WCAG 2.2 · 2.3.3 animation from interactions, 2.3.1 flash thresholds; HIG Motion; Material 3 motion (emphasized easing).",
+      "url": "https://edwson.com/consumer-design-system.html#motion"
+    },
+    {
+      "id": "iconography",
+      "name": "Iconography",
+      "domain": "foundations",
+      "summary": "Icons are labels that got shorter, not decoration that got meaning. One family, one optical grid, and a text label whenever the action is destructive or unfamiliar.",
+      "anchor": "HIG SF Symbols conventions (weight-matched, filled-selected); Material Symbols; WCAG 2.2 · 1.1.1 non-text content.",
+      "url": "https://edwson.com/consumer-design-system.html#iconography"
+    },
+    {
+      "id": "haptics",
+      "name": "Haptics & Sound",
+      "domain": "foundations",
+      "summary": "The invisible foundation. A web page can't fire a Taptic Engine, so this entry is the policy layer: when native surfaces of the same product should speak through touch and sound, and when they must stay silent.",
+      "anchor": "HIG Playing haptics (\"use haptics consistently, don't overuse\"); Material guidance on haptic feedback; WCAG 2.2 · 1.1 perceivable redundancy principle.",
+      "url": "https://edwson.com/consumer-design-system.html#haptics"
+    },
+    {
+      "id": "button",
+      "name": "Button",
+      "domain": "core",
+      "summary": "The pill is the promise: one obvious next step per view. Everything else steps down in weight until hierarchy does the persuading, not color.",
+      "anchor": "HIG Buttons (prominence hierarchy, 44pt targets); Material 3 button hierarchy; WCAG 2.2 · 2.5.8 target size, 2.4.7 focus visible.",
+      "url": "https://edwson.com/consumer-design-system.html#button"
+    },
+    {
+      "id": "input",
+      "name": "Text Input",
+      "domain": "core",
+      "summary": "Labels stay visible, errors say what to do next, and the keyboard that appears is the one the field deserves. Most abandoned checkouts die in a form.",
+      "anchor": "WCAG 2.2 · 3.3.1 error identification, 3.3.2 labels, 3.3.7 redundant entry, 1.3.5 identify input purpose (autocomplete); HIG Text fields.",
+      "url": "https://edwson.com/consumer-design-system.html#input"
+    },
+    {
+      "id": "search",
+      "name": "Search Field",
+      "domain": "core",
+      "summary": "The front door of every catalog, feed, and library. Rounded, iconed, instant — and it never punishes an empty result with a dead end.",
+      "anchor": "HIG Search fields; Material 3 search; WCAG 2.2 · 4.1.3 status messages (result counts).",
+      "url": "https://edwson.com/consumer-design-system.html#search"
+    },
+    {
+      "id": "select",
+      "name": "Select",
+      "domain": "core",
+      "summary": "The native picker wearing the system's clothes. On phones the OS wheel and sheet pickers beat anything a div can fake — so this select stays a <select>.",
+      "anchor": "HIG Pickers; Material 3 menus; WCAG 2.2 · 4.1.2 name-role-value (free with native semantics).",
+      "url": "https://edwson.com/consumer-design-system.html#select"
+    },
+    {
+      "id": "slider",
+      "name": "Slider",
+      "domain": "core",
+      "summary": "For values where the feel matters more than the digits — volume, brightness, price range. The current value is always readable, never guessed from thumb position.",
+      "anchor": "HIG Sliders; Material 3 sliders; WCAG 2.2 · 2.5.7 dragging movements (keyboard alternative required), 2.5.8 target size.",
+      "url": "https://edwson.com/consumer-design-system.html#slider"
+    },
+    {
+      "id": "toggle",
+      "name": "Toggle Switch",
+      "domain": "core",
+      "summary": "The switch means now — flip it and the thing is on. If anything else must happen first (a save button, a payment), it isn't a switch.",
+      "anchor": "HIG Toggles; Material 3 switch; WCAG 2.2 · 1.4.1 use of color, 4.1.2 name-role-value; GDPR Art 7 — data toggles default off.",
+      "url": "https://edwson.com/consumer-design-system.html#toggle"
+    },
+    {
+      "id": "choice",
+      "name": "Checkbox & Radio",
+      "domain": "core",
+      "summary": "The oldest controls on the web, kept native and kept honest: checkboxes for any-of, radios for one-of, and the whole row is the target.",
+      "anchor": "WCAG 2.2 · 1.3.1 info & relationships (fieldset), 2.5.8 target size; GDPR Art 7(2) — unbundled, unticked consent; ePrivacy consent conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#choice"
+    },
+    {
+      "id": "segmented",
+      "name": "Segmented Control",
+      "domain": "core",
+      "summary": "All the options, all the time. The sliding thumb makes switching feel free — which is exactly when users explore.",
+      "anchor": "HIG Segmented controls; Material 3 segmented buttons; WAI-ARIA radio-group pattern.",
+      "url": "https://edwson.com/consumer-design-system.html#segmented"
+    },
+    {
+      "id": "quantity",
+      "name": "Quantity Stepper",
+      "domain": "core",
+      "summary": "Plus, minus, and a number that never surprises you. The humble stepper moves more units of physical goods than any carousel ever will.",
+      "anchor": "HIG Steppers; WCAG 2.2 · 4.1.3 status messages, 2.5.8 target size.",
+      "url": "https://edwson.com/consumer-design-system.html#quantity"
+    },
+    {
+      "id": "chip",
+      "name": "Chip & Tag",
+      "domain": "core",
+      "summary": "Small, tappable, and plural. Chips are how consumer products let people say \"these, not those\" without a form.",
+      "anchor": "Material 3 chips (filter/input/assist); HIG Tokens & tags conventions; WCAG 2.2 · 2.5.8.",
+      "url": "https://edwson.com/consumer-design-system.html#chip"
+    },
+    {
+      "id": "badge",
+      "name": "Badge & Count",
+      "domain": "core",
+      "summary": "Tiny, loud, and easy to abuse. A badge is a claim on attention — this system rations them like the currency they are.",
+      "anchor": "HIG notification badge conventions; Material 3 badges; WCAG 2.2 · 1.4.1 use of color.",
+      "url": "https://edwson.com/consumer-design-system.html#badge"
+    },
+    {
+      "id": "avatar",
+      "name": "Avatar & Presence",
+      "domain": "core",
+      "summary": "The pixel-sized proof there's a person here. Initials fall back gracefully, groups stack, and the green dot never lies.",
+      "anchor": "WCAG 2.2 · 1.1.1 non-text content, 1.4.1 use of color; GDPR — presence is personal data, off by default where jurisdictions require.",
+      "url": "https://edwson.com/consumer-design-system.html#avatar"
+    },
+    {
+      "id": "card",
+      "name": "Card",
+      "domain": "core",
+      "summary": "One idea per card, one card per idea. The hover lift is the system's handshake — content rises to meet you, gently.",
+      "anchor": "Material 3 cards; HIG content organisation; WCAG 2.2 · 2.4.4 link purpose in context.",
+      "url": "https://edwson.com/consumer-design-system.html#card"
+    },
+    {
+      "id": "list",
+      "name": "List & Cell",
+      "domain": "core",
+      "summary": "The inset grouped list is the load-bearing wall of every consumer app: settings, inboxes, results, orders. Icon, two lines, trailing detail — a grammar everyone already reads.",
+      "anchor": "HIG Lists and tables (inset grouped); Material 3 lists; WCAG 2.2 · 2.5.8, 1.3.1.",
+      "url": "https://edwson.com/consumer-design-system.html#list"
+    },
+    {
+      "id": "tabs",
+      "name": "Tabs",
+      "domain": "core",
+      "summary": "Peer views of the same subject, underlined so the floor tells you where you stand. Tabs change the view; the tab bar (see Navigation) changes the world.",
+      "anchor": "WAI-ARIA tabs pattern; Material 3 tabs; HIG segmented alternatives guidance.",
+      "url": "https://edwson.com/consumer-design-system.html#tabs"
+    },
+    {
+      "id": "toast",
+      "name": "Toast & Snackbar",
+      "domain": "core",
+      "summary": "Confirmation that doesn't ask for anything back. Glass pill, four seconds, gone — and when it carries an Undo, it is quietly the most humane component in the system.",
+      "anchor": "Material 3 snackbar; WCAG 2.2 · 2.2.1 timing adjustable, 4.1.3 status messages.",
+      "url": "https://edwson.com/consumer-design-system.html#toast"
+    },
+    {
+      "id": "modal",
+      "name": "Modal Dialog",
+      "domain": "core",
+      "summary": "The interface's interruption budget, spent one dialog at a time. If the user didn't cause it and can't lose anything, it doesn't get to be modal.",
+      "anchor": "WAI-ARIA dialog pattern; HIG Alerts (outcome-named buttons); WCAG 2.2 · 2.4.3 focus order, 2.1.2 no keyboard trap.",
+      "url": "https://edwson.com/consumer-design-system.html#modal"
+    },
+    {
+      "id": "bottom-sheet",
+      "name": "Bottom Sheet",
+      "domain": "core",
+      "summary": "The mobile-native answer to \"show me options without leaving.\" It rises from where thumbs live, and the grabber is a promise: you can always push it back down.",
+      "anchor": "HIG Sheets (detents, grabber); Material 3 bottom sheets; WCAG 2.2 · 2.1.2, 2.5.7 (swipe has button alternative).",
+      "url": "https://edwson.com/consumer-design-system.html#bottom-sheet"
+    },
+    {
+      "id": "popover",
+      "name": "Popover & Tooltip",
+      "domain": "core",
+      "summary": "Small truths anchored to the thing they describe. Tooltips name, popovers act — neither ever holds information that exists nowhere else.",
+      "anchor": "WCAG 2.2 · 1.4.13 content on hover or focus; WAI-ARIA menu & tooltip patterns; HIG Popovers.",
+      "url": "https://edwson.com/consumer-design-system.html#popover"
+    },
+    {
+      "id": "progress",
+      "name": "Progress & Loading",
+      "domain": "core",
+      "summary": "Honesty about time. Determinate when the end is known, a spinner only when it's short, and a skeleton when there's a shape worth promising.",
+      "anchor": "HIG Progress indicators; Material 3 progress; WCAG 2.2 · 4.1.3 status messages.",
+      "url": "https://edwson.com/consumer-design-system.html#progress"
+    },
+    {
+      "id": "skeleton",
+      "name": "Skeleton",
+      "domain": "core",
+      "summary": "A promise of shape. The screen commits to its layout before the data arrives, so loading feels like focus resolving rather than construction work.",
+      "anchor": "Material loading guidance; WCAG 2.2 · 2.3.3 animation from interactions; Core Web Vitals CLS discipline.",
+      "url": "https://edwson.com/consumer-design-system.html#skeleton"
+    },
+    {
+      "id": "pagination",
+      "name": "Pagination & Dots",
+      "domain": "core",
+      "summary": "Numbered pages for destinations you'll cite and return to; dots for carousels you'll drift through. Both tell you where you are — that's the entire job.",
+      "anchor": "HIG Page controls; WCAG 2.2 · 2.4.8 location, 4.1.2 name-role-value.",
+      "url": "https://edwson.com/consumer-design-system.html#pagination"
+    },
+    {
+      "id": "accordion",
+      "name": "Accordion",
+      "domain": "core",
+      "summary": "Progressive disclosure on native semantics. Built on <details>, so it works with JavaScript disabled, and searchable-in-page in modern browsers.",
+      "anchor": "WAI-ARIA disclosure pattern (native <details>); WCAG 2.2 · 4.1.2; HIG disclosure controls.",
+      "url": "https://edwson.com/consumer-design-system.html#accordion"
+    },
+    {
+      "id": "empty",
+      "name": "Empty State",
+      "domain": "core",
+      "summary": "The first screen most new users actually see. An empty state is onboarding wearing casual clothes — it names the value and hands over the first move.",
+      "anchor": "Material empty state guidance; NN/g empty-state conventions; WCAG 2.2 · 2.4.6 headings and labels.",
+      "url": "https://edwson.com/consumer-design-system.html#empty"
+    },
+    {
+      "id": "banner",
+      "name": "Banner & Inline Alert",
+      "domain": "core",
+      "summary": "Persistent context that waits. Where a toast taps you on the shoulder and leaves, a banner sits down until the situation changes.",
+      "anchor": "Material 3 banners; WCAG 2.2 · 4.1.3 status messages, 1.4.1 use of color.",
+      "url": "https://edwson.com/consumer-design-system.html#banner"
+    },
+    {
+      "id": "datepicker",
+      "name": "Date & Time Picker",
+      "domain": "core",
+      "summary": "The control people fight with most, because it is the one place a product insists on its own format instead of accepting yours. Take typing. Take pasting. Take “next Friday” if you can.",
+      "anchor": "WAI-ARIA Authoring Practices · Date Picker Dialog; WCAG 2.2 · 2.1.1 keyboard, 3.3.2 labels or instructions; HIG Pickers; Material 3 Date pickers.",
+      "url": "https://edwson.com/consumer-design-system.html#datepicker"
+    },
+    {
+      "id": "upload",
+      "name": "Upload & Camera",
+      "domain": "core",
+      "summary": "Uploading is the moment a user hands you something they cannot easily replace. Show the file before you take it, show the progress while you take it, and let them take it back.",
+      "anchor": "WCAG 2.2 · 4.1.3 status messages, 3.3.1 error identification; HIG Photos & camera access; App Store Review 5.1.1 (purpose strings); GDPR Art. 5(1)(c) data minimisation — location EXIF is personal data.",
+      "url": "https://edwson.com/consumer-design-system.html#upload"
+    },
+    {
+      "id": "stepper",
+      "name": "Multi-Step Form",
+      "domain": "core",
+      "summary": "Splitting a long form into steps does not make it shorter. It makes it survivable — but only if the user can see how far it goes, go back without loss, and leave without starting over.",
+      "anchor": "WCAG 2.2 · 2.4.3 focus order, 3.3.4 error prevention, 3.3.7 redundant entry (don't ask twice for what you already have); Material 3 Steppers; NN/g progressive disclosure.",
+      "url": "https://edwson.com/consumer-design-system.html#stepper"
+    },
+    {
+      "id": "coachmark",
+      "name": "Coach Mark",
+      "domain": "core",
+      "summary": "A tooltip you didn't ask for. It is the most abused component in consumer software, so it gets the strictest rule in this system: one, at the moment it is useful, dismissible forever.",
+      "anchor": "HIG Onboarding (“teach in context”); WCAG 2.2 · 1.4.13 content on hover or focus, 2.1.2 no keyboard trap; Material 3 Tooltips (rich).",
+      "url": "https://edwson.com/consumer-design-system.html#coachmark"
+    },
+    {
+      "id": "navbar",
+      "name": "Navigation Bar",
+      "domain": "navigation",
+      "summary": "Glass over content: the bar defers to the page scrolling beneath it, and the active pill answers \"where am I\" without a map.",
+      "anchor": "HIG Navigation bars; WCAG 2.2 · 2.4.1 bypass blocks, 2.4.8 location.",
+      "url": "https://edwson.com/consumer-design-system.html#navbar"
+    },
+    {
+      "id": "tabbar",
+      "name": "Tab Bar",
+      "domain": "navigation",
+      "summary": "Five doors at the bottom of the world. The tab bar is the most valuable real estate in a consumer app — every slot must earn daily use.",
+      "anchor": "HIG Tab bars; Material 3 navigation bar (label conventions); WCAG 2.2 · 2.4.8.",
+      "url": "https://edwson.com/consumer-design-system.html#tabbar"
+    },
+    {
+      "id": "drawer",
+      "name": "Drawer & Side Menu",
+      "domain": "navigation",
+      "summary": "The overflow home for secondary destinations — account, orders, help, legal. A drawer is where things go so the tab bar doesn't have to lie about their importance.",
+      "anchor": "Material 3 navigation drawer; WCAG 2.2 · 2.1.2 no keyboard trap, 4.1.2.",
+      "url": "https://edwson.com/consumer-design-system.html#drawer"
+    },
+    {
+      "id": "breadcrumb",
+      "name": "Breadcrumb",
+      "domain": "navigation",
+      "summary": "The paper trail through a deep catalog. Mostly a desktop commerce citizen — on phones the back button carries this weight.",
+      "anchor": "WAI-ARIA breadcrumb pattern; schema.org BreadcrumbList (SEO); WCAG 2.2 · 2.4.8.",
+      "url": "https://edwson.com/consumer-design-system.html#breadcrumb"
+    },
+    {
+      "id": "fab",
+      "name": "Floating Action Button",
+      "domain": "navigation",
+      "summary": "One verb, promoted above the page. The FAB works when the screen has an obvious main thing to do — compose, add, capture — and fails everywhere else.",
+      "anchor": "Material 3 FAB; WCAG 2.2 · 2.5.8 target size, 2.4.7 focus visible.",
+      "url": "https://edwson.com/consumer-design-system.html#fab"
+    },
+    {
+      "id": "large-title",
+      "name": "Large Title Header",
+      "domain": "navigation",
+      "summary": "The title starts as a headline and condenses into chrome as you scroll — orientation you feel rather than read. Scroll the demo.",
+      "anchor": "HIG Navigation bars (large titles); WCAG 2.2 · 1.3.1 heading structure.",
+      "url": "https://edwson.com/consumer-design-system.html#large-title"
+    },
+    {
+      "id": "welcome",
+      "name": "Welcome Flow",
+      "domain": "onboarding",
+      "summary": "Three screens, one promise each, and a skip that actually works. The best onboarding is mostly the product, sooner.",
+      "anchor": "HIG Onboarding (\"get to the app quickly\"); Material onboarding guidance; WCAG 2.2 · 2.5.7 dragging movements.",
+      "url": "https://edwson.com/consumer-design-system.html#welcome"
+    },
+    {
+      "id": "sso",
+      "name": "Sign-in & SSO",
+      "domain": "onboarding",
+      "summary": "The fewest keystrokes between a person and their account. Platform sign-in first, email as the dignified fallback, passwords as the last resort they've become.",
+      "anchor": "App Store Review Guideline 4.8 (offering an equivalent privacy-respecting login option); provider brand guidelines; WCAG 2.2 · 3.3.8 accessible authentication.",
+      "url": "https://edwson.com/consumer-design-system.html#sso"
+    },
+    {
+      "id": "otp",
+      "name": "One-Time Code",
+      "domain": "onboarding",
+      "summary": "Six boxes and thirty anxious seconds. Everything about this component exists to make the code arrive, paste, and verify itself.",
+      "anchor": "WCAG 2.2 · 3.3.8 accessible authentication (minimum); HIG security code AutoFill conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#otp"
+    },
+    {
+      "id": "passkey",
+      "name": "Passkey Prompt",
+      "domain": "onboarding",
+      "summary": "The end of passwords, sold in one card. The design job is trust: say what a passkey is in one sentence, and make \"not now\" a real choice.",
+      "anchor": "FIDO2 / WebAuthn UX conventions; HIG passkeys guidance; WCAG 2.2 · 3.3.8 (passkeys are the compliant path).",
+      "url": "https://edwson.com/consumer-design-system.html#passkey"
+    },
+    {
+      "id": "profile-setup",
+      "name": "Profile Setup",
+      "domain": "onboarding",
+      "summary": "Ask little, explain why, skip everything. Every optional field completed here is a gift the user gave you — design like you know it.",
+      "anchor": "GDPR Art 5(1)(c) data minimisation; App Store Guideline 5.1.1 (don't require unneeded personal data); WCAG 2.2 · 3.3.2.",
+      "url": "https://edwson.com/consumer-design-system.html#profile-setup"
+    },
+    {
+      "id": "permission",
+      "name": "Permission Primer",
+      "domain": "onboarding",
+      "summary": "You get one shot at the OS permission dialog. The primer spends its own screen to make sure you take that shot at the moment the user already wants to say yes.",
+      "anchor": "HIG \"request permission at the moment of need\"; Play policy on prominent disclosure; GDPR Art 6 purpose limitation.",
+      "url": "https://edwson.com/consumer-design-system.html#permission"
+    },
+    {
+      "id": "consent",
+      "name": "Consent Manager",
+      "domain": "onboarding",
+      "summary": "The component regulators read first. Reject is as easy as accept, defaults are off, and the toggles do what they say — consent here is a designed artifact, not a legal speed bump.",
+      "anchor": "GDPR Art 7 & Recital 32 (freely given, specific, unambiguous); ePrivacy; CCPA/CPRA opt-out rights; EU DSA Art 25 (no deceptive interface design).",
+      "url": "https://edwson.com/consumer-design-system.html#consent"
+    },
+    {
+      "id": "paywall",
+      "name": "Paywall & Plans",
+      "domain": "onboarding",
+      "summary": "The most scrutinised screen in any subscription app — by users, by app review, by the FTC. This one converts by being legible: real prices, real terms, restore always visible.",
+      "anchor": "App Store Review Guideline 3.1.2 (subscription clarity) & Schedule 2 rules; Play subscriptions policy; FTC Negative Option Rule (clear disclosure before billing).",
+      "url": "https://edwson.com/consumer-design-system.html#paywall"
+    },
+    {
+      "id": "product-card",
+      "name": "Product Card",
+      "domain": "commerce",
+      "summary": "The unit of browsing. Image leads, price never hides, and the save affordance floats where thumbs already are.",
+      "anchor": "WCAG 2.2 · 2.4.4 link purpose; FTC truth-in-advertising (scarcity claims must be true); schema.org Product markup.",
+      "url": "https://edwson.com/consumer-design-system.html#product-card"
+    },
+    {
+      "id": "price",
+      "name": "Price Display",
+      "domain": "commerce",
+      "summary": "Tabular, truthful, and complete. A price is a fact with typography — strikethroughs need a real former price, and the number you show is the number they pay.",
+      "anchor": "FTC Guides Against Deceptive Pricing (16 CFR 233); EU Price Indication Directive (prior-price rules); WCAG 2.2 · 1.3.1.",
+      "url": "https://edwson.com/consumer-design-system.html#price"
+    },
+    {
+      "id": "cart-item",
+      "name": "Cart Line Item",
+      "domain": "commerce",
+      "summary": "Where second thoughts happen. Every line item makes changing your mind cheap — adjust, save for later, remove — because a trapped cart is an abandoned cart.",
+      "anchor": "FTC Section 5 unfairness (pre-checked add-ons); WCAG 2.2 · 4.1.3; Baymard cart usability conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#cart-item"
+    },
+    {
+      "id": "checkout",
+      "name": "Checkout Summary",
+      "domain": "commerce",
+      "summary": "No math surprises. Every fee has a name, the total is the largest number on screen, and it matches the charge to the cent.",
+      "anchor": "FTC junk-fee rulemaking (all-in pricing); EU Consumer Rights Directive Art 6 (total cost pre-order); WCAG 2.2 · 4.1.3.",
+      "url": "https://edwson.com/consumer-design-system.html#checkout"
+    },
+    {
+      "id": "payment",
+      "name": "Payment Method",
+      "domain": "commerce",
+      "summary": "Radio rows for money. Wallets first (they convert best and typo least), saved cards next, new card last — and the selected row is unmistakable.",
+      "anchor": "PCI-DSS display rules (last four only); card-network brand guidelines; WCAG 2.2 · 3.3.8 (no card-number memory tests).",
+      "url": "https://edwson.com/consumer-design-system.html#payment"
+    },
+    {
+      "id": "promo",
+      "name": "Promo Code",
+      "domain": "commerce",
+      "summary": "A tiny form with outsized feelings. Success celebrates with the exact amount saved; failure explains without blaming.",
+      "anchor": "WCAG 2.2 · 3.3.1, 3.3.3 error suggestion, 4.1.3; FTC advertised-discount truthfulness.",
+      "url": "https://edwson.com/consumer-design-system.html#promo"
+    },
+    {
+      "id": "reviews",
+      "name": "Ratings & Reviews",
+      "domain": "commerce",
+      "summary": "Social proof with a chain of custody. Stars summarise, distributions tell the truth, and \"verified purchase\" means the system checked.",
+      "anchor": "FTC Rule on Consumer Reviews and Testimonials (16 CFR 465); Consumer Review Fairness Act; WCAG 2.2 · 1.3.1.",
+      "url": "https://edwson.com/consumer-design-system.html#reviews"
+    },
+    {
+      "id": "wishlist",
+      "name": "Save & Wishlist",
+      "domain": "commerce",
+      "summary": "The lowest-commitment yes in commerce. A save is a bookmark on desire — instant, reversible, synced, and never guilt-tripped.",
+      "anchor": "WCAG 2.2 · 4.1.2 name-role-value; GDPR-conscious local-first storage; HIG feedback conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#wishlist"
+    },
+    {
+      "id": "order-tracking",
+      "name": "Order Tracking",
+      "domain": "commerce",
+      "summary": "The screen people open eleven times for one package. Its whole job is a truthful answer to \"where is it and when\" — everything else is decoration.",
+      "anchor": "FTC Mail Order Rule (shipment timing representations); WCAG 2.2 · 1.3.1, 1.4.1.",
+      "url": "https://edwson.com/consumer-design-system.html#order-tracking"
+    },
+    {
+      "id": "subscription",
+      "name": "Subscription Management",
+      "domain": "commerce",
+      "summary": "The screen that decides whether a customer trusts you, because it is where they find out what you have been charging them and whether you made it hard to stop.",
+      "anchor": "FTC negative-option / click-to-cancel rulemaking (cancel as easy as sign-up; confirm dates with counsel); EU Consumer Rights Directive 2011/83 (pre-contract information); App Store Review 3.1.2; Google Play Subscriptions policy.",
+      "url": "https://edwson.com/consumer-design-system.html#subscription"
+    },
+    {
+      "id": "feed-post",
+      "name": "Feed Post",
+      "domain": "social",
+      "summary": "The atom of the social web: who, what, and three verbs. The layout is a contract with the reader — authorship always above content, actions always below it.",
+      "anchor": "FTC Endorsement Guides (ad disclosure); WCAG 2.2 · 1.1.1, 4.1.2; EU DSA transparency for recommender systems.",
+      "url": "https://edwson.com/consumer-design-system.html#feed-post"
+    },
+    {
+      "id": "comments",
+      "name": "Comment Thread",
+      "domain": "social",
+      "summary": "Conversation with indentation as grammar. One level of nesting reads as reply; two reads as argument; three reads as nothing at all — so this system stops at one.",
+      "anchor": "WCAG 2.2 · 1.3.1; EU DSA Art 16 (notice mechanisms adjacent to content); community-safety conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#comments"
+    },
+    {
+      "id": "reactions",
+      "name": "Reaction Bar",
+      "domain": "social",
+      "summary": "Six feelings on a glass shelf. The long-press reveal is one of the small delights consumer software is allowed — spent here because reacting is frequent, safe, and reversible.",
+      "anchor": "WCAG 2.2 · 2.5.7 dragging/press alternatives; WAI-ARIA toolbar pattern; HIG feedback conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#reactions"
+    },
+    {
+      "id": "share",
+      "name": "Share Sheet",
+      "domain": "social",
+      "summary": "Distribution's front door. People first, then platforms, then plumbing (copy link) — ordered by what the user does, not what growth wants.",
+      "anchor": "HIG activity views (share sheets); Web Share API conventions; WCAG 2.2 · 2.1.1.",
+      "url": "https://edwson.com/consumer-design-system.html#share"
+    },
+    {
+      "id": "chat",
+      "name": "Chat Bubbles",
+      "domain": "social",
+      "summary": "Two voices, two sides, zero ambiguity. Yours right and tinted, theirs left and neutral — a convention so strong that breaking it reads as a bug.",
+      "anchor": "WCAG 2.2 · 4.1.3, 1.4.3; EU AI Act transparency (bot disclosure); messaging privacy norms (GDPR).",
+      "url": "https://edwson.com/consumer-design-system.html#chat"
+    },
+    {
+      "id": "notification",
+      "name": "Notification Item",
+      "domain": "social",
+      "summary": "A sentence with a face. Actor, verb, object, time — and unread state you can see from across the room. The list is an inbox, so it behaves like one.",
+      "anchor": "HIG Notifications (\"valuable, not promotional\"); Play FCM policy; WCAG 2.2 · 1.4.1.",
+      "url": "https://edwson.com/consumer-design-system.html#notification"
+    },
+    {
+      "id": "follow",
+      "name": "Follow Button",
+      "domain": "social",
+      "summary": "The smallest social contract. Following is loud, followed is quiet — the state change is the entire design, so it must be unmistakable and reversible in one tap.",
+      "anchor": "WCAG 2.2 · 4.1.2, 1.4.1; platform anti-spam norms (no auto-follow).",
+      "url": "https://edwson.com/consumer-design-system.html#follow"
+    },
+    {
+      "id": "story",
+      "name": "Story Ring",
+      "domain": "social",
+      "summary": "A gradient halo that means \"new, and it expires.\" The seen state — gray, quiet — is just as much the design as the rainbow.",
+      "anchor": "WCAG 2.2 · 1.4.1, 2.1.1; ephemeral-content honesty conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#story"
+    },
+    {
+      "id": "video",
+      "name": "Video Player Controls",
+      "domain": "media",
+      "summary": "Controls that get out of the way and come back when called. Everything essential within one thumb arc: play, scrub, captions, volume.",
+      "anchor": "WCAG 2.2 · 1.2.2 captions, 2.2.2 pause/stop/hide; HIG playback; Media Session API conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#video"
+    },
+    {
+      "id": "mini-player",
+      "name": "Mini Player",
+      "domain": "media",
+      "summary": "Playback that follows you around the app without blocking it. A glass bar above the tab bar: art, title, play, next — and a tap expands to the full stage.",
+      "anchor": "HIG now-playing conventions; WCAG 2.2 · 2.5.7, 4.1.2.",
+      "url": "https://edwson.com/consumer-design-system.html#mini-player"
+    },
+    {
+      "id": "gallery",
+      "name": "Gallery & Lightbox",
+      "domain": "media",
+      "summary": "A grid that promises and a lightbox that delivers. The grid is uniform and dense; the lightbox is the one place chrome fully yields to the image.",
+      "anchor": "WCAG 2.2 · 2.5.7, 1.1.1; HIG image viewing conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#gallery"
+    },
+    {
+      "id": "carousel",
+      "name": "Carousel",
+      "domain": "media",
+      "summary": "Scroll-snap, native momentum, and a peek of the next slide doing the affordance work. The browser already knows how to swipe — this component just stops fighting it.",
+      "anchor": "WCAG 2.2 · 2.2.2 pause/stop/hide; CSS scroll-snap conventions; NN/g carousel research.",
+      "url": "https://edwson.com/consumer-design-system.html#carousel"
+    },
+    {
+      "id": "live",
+      "name": "Live Badge",
+      "domain": "media",
+      "summary": "Two words that must never lie: LIVE means now, and the pulse means the signal is real. The moment the stream ends, the badge dies with it.",
+      "anchor": "FTC deception standard (liveness claims); WCAG 2.2 · 1.4.1, 2.3.3.",
+      "url": "https://edwson.com/consumer-design-system.html#live"
+    },
+    {
+      "id": "captions",
+      "name": "Captions",
+      "domain": "media",
+      "summary": "Most video is watched silent; captions are the soundtrack most people actually use. High contrast, two lines, and never covering the faces they transcribe.",
+      "anchor": "WCAG 2.2 · 1.2.2 captions (prerecorded), 1.2.4 (live); FCC caption quality rules; CVAA.",
+      "url": "https://edwson.com/consumer-design-system.html#captions"
+    },
+    {
+      "id": "checklist",
+      "name": "Onboarding Checklist",
+      "domain": "growth",
+      "summary": "Progress you can feel. The checklist turns \"set up your account\" from a lecture into a game the user is already winning — because the first item arrives pre-checked.",
+      "anchor": "Endowed progress research (Nunes & Drèze); WCAG 2.2 · 4.1.3; EU DSA Art 25 (no manipulative pressure).",
+      "url": "https://edwson.com/consumer-design-system.html#checklist"
+    },
+    {
+      "id": "streak",
+      "name": "Streak & Achievement",
+      "domain": "growth",
+      "summary": "Celebration without hostage-taking. A streak marks showing up; this one is designed so missing a day stings less than the habit is worth.",
+      "anchor": "EU DSA Art 25; FTC dark-pattern report (guilt-driven engagement); WCAG 2.2 · 2.3.3.",
+      "url": "https://edwson.com/consumer-design-system.html#streak"
+    },
+    {
+      "id": "referral",
+      "name": "Referral Card",
+      "domain": "growth",
+      "summary": "Both sides of the deal on one card. Referrals work when the invitation is a gift, not an extraction — so the friend's reward leads.",
+      "anchor": "FTC endorsement rules (incentivised referrals disclose); CAN-SPAM / TCPA (user-initiated sends); WCAG 2.2 · 1.4.5.",
+      "url": "https://edwson.com/consumer-design-system.html#referral"
+    },
+    {
+      "id": "push-primer",
+      "name": "Push Pre-Prompt",
+      "domain": "growth",
+      "summary": "Permission with a menu. Instead of \"allow notifications?\", the primer asks which — orders only, or the social noise too — and the OS prompt fires only after a real yes.",
+      "anchor": "HIG asking permission; Android notification channels; Play FCM policy; ePrivacy (marketing push is consent-based).",
+      "url": "https://edwson.com/consumer-design-system.html#push-primer"
+    },
+    {
+      "id": "review-prompt",
+      "name": "In-App Review Prompt",
+      "domain": "growth",
+      "summary": "Ask happy people, once, at the right moment — and never intercept the unhappy into a private complaint box while herding fans to the store. That fork is now a violation, not a growth hack.",
+      "anchor": "FTC 16 CFR 465.4 (review suppression); App Store Guideline 1.1.7 & SKStoreReviewController limits; Play in-app review API rules.",
+      "url": "https://edwson.com/consumer-design-system.html#review-prompt"
+    },
+    {
+      "id": "nps",
+      "name": "Survey & NPS",
+      "domain": "growth",
+      "summary": "One question, honestly asked, instantly dismissible. Survey fatigue is a design failure — this component is rationed like the interruption it is.",
+      "anchor": "WCAG 2.2 · 1.3.1, 4.1.3; research-ethics conventions (voluntary, no dark nudges).",
+      "url": "https://edwson.com/consumer-design-system.html#nps"
+    },
+    {
+      "id": "whats-new",
+      "name": "What's New",
+      "domain": "growth",
+      "summary": "Release notes people might actually read: three items, verbs first, each row deep-linking to the feature it announces. Shown once, then it's a page, not a prompt.",
+      "anchor": "HIG onboarding & release-note conventions; WCAG 2.2 · 2.4.4.",
+      "url": "https://edwson.com/consumer-design-system.html#whats-new"
+    },
+    {
+      "id": "report",
+      "name": "Report & Block",
+      "domain": "trust",
+      "summary": "The exits from a bad interaction, always two taps away. Report feeds the system; block protects the person — the component never confuses whose problem each solves.",
+      "anchor": "EU DSA Art 16 (notice and action) & Art 20 (appeals); App Store Guideline 1.2 (UGC apps must have report/block); Play UGC policy.",
+      "url": "https://edwson.com/consumer-design-system.html#report"
+    },
+    {
+      "id": "content-warning",
+      "name": "Content Warning",
+      "domain": "trust",
+      "summary": "A blur that respects both the viewer and the content. It names the category, offers the choice, and remembers the preference — informed consent at feed speed.",
+      "anchor": "EU DSA systemic-risk mitigation; App Store 1.2 / Play sensitive-content rules; WCAG 2.2 · 1.4.3.",
+      "url": "https://edwson.com/consumer-design-system.html#content-warning"
+    },
+    {
+      "id": "age-gate",
+      "name": "Age Gate",
+      "domain": "trust",
+      "summary": "A door, not a decoration. Where children's privacy law applies, the gate is designed to be neutral — it doesn't wink, hint, or make the underage path retryable until it passes.",
+      "anchor": "COPPA · 16 CFR Part 312 (neutral age screening, FTC guidance); GDPR Art 8; UK Age Appropriate Design Code.",
+      "url": "https://edwson.com/consumer-design-system.html#age-gate"
+    },
+    {
+      "id": "privacy-dashboard",
+      "name": "Privacy Dashboard",
+      "domain": "trust",
+      "summary": "Every promise the consent screen made, auditable in one place. What's collected, why, and the switch to stop it — the settings page as a trust document.",
+      "anchor": "GDPR Arts 13–15 (transparency & access); CCPA right to know; Apple privacy nutrition labels (App Store 5.1).",
+      "url": "https://edwson.com/consumer-design-system.html#privacy-dashboard"
+    },
+    {
+      "id": "data-rights",
+      "name": "Data Rights",
+      "domain": "trust",
+      "summary": "Download everything, delete everything — as self-service buttons, not support tickets. The delete flow states its consequences once, plainly, then does what it says.",
+      "anchor": "GDPR Art 17 (erasure) & 20 (portability); CCPA deletion right; App Store 5.1.1(v) — account deletion in-app if creation is in-app.",
+      "url": "https://edwson.com/consumer-design-system.html#data-rights"
+    },
+    {
+      "id": "verified",
+      "name": "Verified Badge",
+      "domain": "trust",
+      "summary": "A checkmark is a claim the platform makes with its own reputation. This one means identity was checked — never that content is true, and never that a fee was paid unless the label says so.",
+      "anchor": "EU DSA Art 25 & trader traceability (Art 30); FTC deception standard; WCAG 2.2 · 1.1.1.",
+      "url": "https://edwson.com/consumer-design-system.html#verified"
+    },
+    {
+      "id": "security-checkup",
+      "name": "Security Checkup",
+      "domain": "trust",
+      "summary": "An annual physical for the account, readable in ten seconds. Green means done, amber means one tap to fix — and the score never shames, it invites.",
+      "anchor": "NIST 800-63 authenticator guidance; WCAG 2.2 · 1.4.1; platform account-security conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#security-checkup"
+    },
+    {
+      "id": "account-deletion",
+      "name": "Account Deletion",
+      "domain": "trust",
+      "summary": "A door that only opens inwards is not a door. If a user can create an account in the app, they must be able to end it in the app — and know exactly what that ends.",
+      "anchor": "App Store Review 5.1.1(v) — in-app account deletion is required; Google Play Data deletion policy (in-app and web route); GDPR Art. 17 right to erasure and Art. 20 portability; CCPA/CPRA deletion rights.",
+      "url": "https://edwson.com/consumer-design-system.html#account-deletion"
+    },
+    {
+      "id": "ai-composer",
+      "name": "AI Composer",
+      "domain": "ai",
+      "summary": "The blank box is the hardest interface in consumer software: infinite capability, zero affordance. The composer's job is not to look clever — it is to tell you what this thing can do and where its edges are, before you waste a turn finding out.",
+      "anchor": "WCAG 2.2 · 3.3.2 labels or instructions, 2.1.1 keyboard; EU AI Act Art. 50 transparency (the user must know they are interacting with an AI system); HIG Machine Learning — set expectations, show the limits.",
+      "url": "https://edwson.com/consumer-design-system.html#ai-composer"
+    },
+    {
+      "id": "ai-response",
+      "name": "Streaming Response",
+      "domain": "ai",
+      "summary": "Streaming solves latency and creates an accessibility problem in the same instant: text that changes sixty times a second is unusable to a screen reader. The fix is to stream to the eye and announce to the ear once.",
+      "anchor": "WCAG 2.2 · 4.1.3 status messages, 2.2.2 pause, stop, hide (moving content); ARIA live-region practice; prefers-reduced-motion for the caret.",
+      "url": "https://edwson.com/consumer-design-system.html#ai-response"
+    },
+    {
+      "id": "ai-citations",
+      "name": "Sources & Citations",
+      "domain": "ai",
+      "summary": "A citation is not decoration. It is the difference between an answer you can check and an answer you must simply believe — and a fabricated citation is worse than none, because it buys trust it hasn't earned.",
+      "anchor": "WCAG 2.2 · 2.4.4 link purpose, 1.4.1 use of colour; FTC guidance on substantiation and deceptive claims; EU AI Act Art. 50 transparency; NIST AI RMF (Measure — traceability of outputs).",
+      "url": "https://edwson.com/consumer-design-system.html#ai-citations"
+    },
+    {
+      "id": "ai-uncertainty",
+      "name": "Confidence & Abstention",
+      "domain": "ai",
+      "summary": "The most valuable thing an AI product can say is “I don't know — here is someone who does.” Abstention is a feature. A confidently wrong answer costs more than no answer, and it costs the user, not you.",
+      "anchor": "NIST AI RMF (Manage — risk-informed escalation); EU AI Act Art. 14 human oversight (high-risk uses); WCAG 2.2 · 1.4.1 use of colour; FTC Section 5 — unsubstantiated capability claims.",
+      "url": "https://edwson.com/consumer-design-system.html#ai-uncertainty"
+    },
+    {
+      "id": "ai-disclosure",
+      "name": "AI Disclosure",
+      "domain": "ai",
+      "summary": "If it was generated, say so — on the artefact, at the moment of viewing, in a form that survives a screenshot's worth of doubt. This is now law in some markets and it will be law in more.",
+      "anchor": "EU AI Act Art. 50 (transparency; machine-readable marking of synthetic content — confirm dates and scope with counsel); C2PA Content Credentials 2.x; FTC guidance on AI claims and endorsements; platform synthetic-media policies.",
+      "url": "https://edwson.com/consumer-design-system.html#ai-disclosure"
+    },
+    {
+      "id": "agent-confirm",
+      "name": "Agent Action Confirmation",
+      "domain": "ai",
+      "summary": "An agent that can act on your behalf is a system that can be wrong on your behalf. The interface question is not “how do we make this smooth” — it is which actions a human must sign, and how we make that signature meaningful rather than reflexive.",
+      "anchor": "EU AI Act Art. 14 human oversight; NIST AI RMF (Govern — accountability for automated actions); PSD2 SCA for payment initiation; WCAG 2.2 · 3.3.4 error prevention (legal, financial, data).",
+      "url": "https://edwson.com/consumer-design-system.html#agent-confirm"
+    },
+    {
+      "id": "agent-trace",
+      "name": "Agent Activity Trace",
+      "domain": "ai",
+      "summary": "When something acts for you while you are not looking, the receipt is the product. A trace is how a user audits a decision they didn't watch — and how they find the moment it went wrong.",
+      "anchor": "EU AI Act Art. 12 record-keeping / logging; NIST AI RMF (Measure — traceability); GDPR Art. 22 (a route to contest an automated decision needs a record of it); SR 11-7 effective challenge, in the regulated sibling of this system.",
+      "url": "https://edwson.com/consumer-design-system.html#agent-trace"
+    },
+    {
+      "id": "ai-suggestions",
+      "name": "Prompt Starters",
+      "domain": "ai",
+      "summary": "Starters are not decoration on an empty state — they are the only honest documentation an AI surface has. Each one is a promise: this is a thing I can actually do.",
+      "anchor": "HIG Machine Learning — “set expectations, offer examples”; WCAG 2.2 · 2.4.6 headings and labels, 2.5.8 target size; NN/g empty-state guidance.",
+      "url": "https://edwson.com/consumer-design-system.html#ai-suggestions"
+    },
+    {
+      "id": "ai-feedback",
+      "name": "Feedback & Correction",
+      "domain": "ai",
+      "summary": "A thumbs-down that goes into a dashboard nobody reads is a complaint box in an empty building. Feedback earns its place only if the user can see what it changed — at minimum, for them.",
+      "anchor": "GDPR Art. 16 right to rectification (if the output is personal data, correction is a right, not a courtesy); DSA Art. 16 notice-and-action for illegal content; NIST AI RMF (Manage — incident feedback loops); WCAG 2.2 · 4.1.2 name, role, value.",
+      "url": "https://edwson.com/consumer-design-system.html#ai-feedback"
+    },
+    {
+      "id": "ai-memory",
+      "name": "Memory & Context",
+      "domain": "ai",
+      "summary": "An assistant that remembers is useful. An assistant that remembers invisibly is surveillance with a friendly voice. The rule is simple: if it remembered it, you can read it, and you can delete it.",
+      "anchor": "GDPR Art. 5 (purpose limitation, minimisation), Art. 9 (special categories), Art. 17 erasure; CCPA/CPRA right to delete; App Store Privacy Nutrition Labels; COPPA (no behavioural profiling of children).",
+      "url": "https://edwson.com/consumer-design-system.html#ai-memory"
+    },
+    {
+      "id": "ai-controls",
+      "name": "Training & Personalisation",
+      "domain": "ai",
+      "summary": "Two different questions get collapsed into one toggle by most products, and it is not an accident: “use my data to personalise my experience” and “use my data to train your model” are not the same deal.",
+      "anchor": "GDPR Art. 7 (freely given, unbundled, as easy to withdraw), Art. 21 objection, Art. 22 automated decisions; EU AI Act transparency duties; App Tracking Transparency; COPPA (verifiable parental consent).",
+      "url": "https://edwson.com/consumer-design-system.html#ai-controls"
+    },
+    {
+      "id": "ai-summary",
+      "name": "AI Summary in Search",
+      "domain": "ai",
+      "summary": "Summarising other people's work at the top of a results page is a redistribution of attention. Do it in a way that still sends the reader — and the credit — onward.",
+      "anchor": "EU AI Act Art. 50 transparency; FTC guidance on deceptive presentation; WCAG 2.2 · 2.4.1 bypass blocks, 1.3.1 info and relationships; copyright and DSM Art. 15 press-publisher rights — substance, not just attribution.",
+      "url": "https://edwson.com/consumer-design-system.html#ai-summary"
+    },
+    {
+      "id": "ai-escalation",
+      "name": "Refusal & Escalation",
+      "domain": "ai",
+      "summary": "Every AI product eventually meets the request it should not answer. The design question is what happens in that second — because a refusal with no exit is just a door closing on someone who came to you for help.",
+      "anchor": "EU AI Act Art. 14 human oversight; DSA Art. 20 internal complaint-handling; App Store Review 1.1/5.1 (safety and sensitive content); NIST AI RMF (Manage — escalation and incident response).",
+      "url": "https://edwson.com/consumer-design-system.html#ai-escalation"
+    },
+    {
+      "id": "ai-voice",
+      "name": "Voice Agent",
+      "domain": "ai",
+      "summary": "Voice removes the screen, and with it every affordance you were relying on. What is left has to carry the whole contract: that it is listening, that it is a machine, and that you can cut it off.",
+      "anchor": "EU AI Act Art. 50 (a person must be told they are talking to an AI); two-party-consent recording laws (e.g. CA Penal Code §632 — confirm per jurisdiction with counsel); WCAG 2.2 · 1.2.4 captions (live), 2.5.4 motion actuation; HIG Siri & voice.",
+      "url": "https://edwson.com/consumer-design-system.html#ai-voice"
+    },
+    {
+      "id": "agent-grants",
+      "name": "Tool & Data Grants",
+      "domain": "ai",
+      "summary": "The permission surface of the MCP era. An agent's power comes from its tools — so every tool and every data source is its own grant: scoped, separately revocable, and visible in one place. \"Allow everything\" is not a setting, it's a surrender.",
+      "anchor": "GDPR Art 5(1)(c) & 6 (purpose limitation — a grant is a purpose); EU AI Act Art 14 human oversight; least-privilege conventions from OAuth scope design.",
+      "url": "https://edwson.com/consumer-design-system.html#agent-grants"
+    },
+    {
+      "id": "agent-queue",
+      "name": "Background Agent Tasks",
+      "domain": "ai",
+      "summary": "Agents work in minutes, not milliseconds — so the queue is a first-class surface. Four honest states: queued, working, needs you, done. \"Needs you\" is the interesting one — it means the agent hit a gate and stopped, which is the system working, not failing.",
+      "anchor": "EU AI Act Art 14 (interruptibility as effective oversight); WCAG 2.2 · 4.1.3 status messages; HIG background task conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#agent-queue"
+    },
+    {
+      "id": "ai-model-picker",
+      "name": "Mode & Model Picker",
+      "domain": "ai",
+      "summary": "Fast or thorough is a real decision users can make — if the trade-off is stated in outcomes, not model names. Nobody should need to know what a parameter count is to choose how carefully their question gets answered.",
+      "anchor": "EU AI Act Art 50 transparency; FTC clarity on charges (paid modes state their price at the decision point); WCAG 2.2 · 4.1.2.",
+      "url": "https://edwson.com/consumer-design-system.html#ai-model-picker"
+    },
+    {
+      "id": "ai-inline-assist",
+      "name": "Ghost Text & Suggested Edits",
+      "domain": "ai",
+      "summary": "The most intimate AI surface: inside the user's own sentence. The contract is absolute — suggested text is unmistakably not-yet-yours, accepting it is always an explicit act, and your words are never overwritten.",
+      "anchor": "WCAG 2.2 · 1.4.1 use of color, 2.1.1 keyboard; HIG Machine Learning — corrections (user stays the author).",
+      "url": "https://edwson.com/consumer-design-system.html#ai-inline-assist"
+    },
+    {
+      "id": "agent-handoff",
+      "name": "Human ↔ Agent Handoff",
+      "domain": "ai",
+      "summary": "When an agent can drive a session — filling a form, working a screen — exactly one question must never be ambiguous: who is driving right now. The handoff banner answers it at all times, and the wheel is always within reach.",
+      "anchor": "EU AI Act Art 14 (oversight must be effective, not nominal — interruptibility is the test); WCAG 2.2 · 2.1.1; EU AI Act Art 50 (the agent's presence is disclosed).",
+      "url": "https://edwson.com/consumer-design-system.html#agent-handoff"
+    },
+    {
+      "id": "ai-usage",
+      "name": "Usage & Cost Meter",
+      "domain": "ai",
+      "summary": "AI features have a meter running, and hiding it is a pricing dark pattern with extra steps. The meter shows what's spent, what's left, and — critically — what happens at the cap, before the cap.",
+      "anchor": "FTC all-in pricing discipline (the cost is disclosed where it's incurred); App Store 3.1 (in-app purchase clarity); WCAG 2.2 · 4.1.3, 1.4.1.",
+      "url": "https://edwson.com/consumer-design-system.html#ai-usage"
+    },
+    {
+      "id": "ai-artifact",
+      "name": "Generated Artifact Card",
+      "domain": "ai",
+      "summary": "When AI output is a thing — an image, a document, an itinerary — it stops being a message and becomes an object with duties: versions that don't destroy each other, provenance you can open, and a disclosure that survives export.",
+      "anchor": "EU AI Act Art 50 (synthetic content marking); C2PA 2.x content credentials; GDPR Art 17 (deleting an artifact deletes its versions).",
+      "url": "https://edwson.com/consumer-design-system.html#ai-artifact"
+    },
+    {
+      "id": "ai-onboarding",
+      "name": "Capability Disclosure",
+      "domain": "ai",
+      "summary": "The first screen of any AI feature decides every later disappointment. Three things it can do, three it can't, one line about data — the anti-magic show. Underclaiming here is the cheapest trust you will ever buy.",
+      "anchor": "EU AI Act Art 50 transparency; FTC deception standard (capability claims); HIG Machine Learning — set accurate expectations.",
+      "url": "https://edwson.com/consumer-design-system.html#ai-onboarding"
+    },
+    {
+      "id": "pull-refresh",
+      "name": "Pull to Refresh",
+      "domain": "patterns",
+      "summary": "The gesture that taught a generation how feeds work. Pull, arm, release — with a visible threshold so the hand always knows whether letting go will act.",
+      "anchor": "HIG refresh content controls; WCAG 2.2 · 2.5.7 dragging movements, 4.1.3.",
+      "url": "https://edwson.com/consumer-design-system.html#pull-refresh"
+    },
+    {
+      "id": "infinite-scroll",
+      "name": "Infinite Scroll vs Pages",
+      "domain": "patterns",
+      "summary": "Infinite scroll is a loan against the user's sense of time. This system spends it only where content is truly endless — and always installs a footer the scroll can land on.",
+      "anchor": "EU DSA Art 25 & recital 67 (attention-exploiting design); WCAG 2.2 · 2.4.1; NN/g infinite-scroll research.",
+      "url": "https://edwson.com/consumer-design-system.html#infinite-scroll"
+    },
+    {
+      "id": "undo",
+      "name": "Undo, Not Confirm",
+      "domain": "patterns",
+      "summary": "Confirmation dialogs make everyone pay a tax because someone might err. Undo charges only the error, only when it happens — act immediately, offer the way back.",
+      "anchor": "WCAG 2.2 · 2.2.1 timing adjustable, 3.3.4 error prevention; HIG undo conventions; NN/g forgiveness principle.",
+      "url": "https://edwson.com/consumer-design-system.html#undo"
+    },
+    {
+      "id": "error-recovery",
+      "name": "Error Recovery",
+      "domain": "patterns",
+      "summary": "Errors are moments of maximum attention — the one time you're guaranteed a careful reader. Say what happened, what it cost, and what to do, in that order.",
+      "anchor": "WCAG 2.2 · 3.3.1, 3.3.3; NN/g error-message guidelines.",
+      "url": "https://edwson.com/consumer-design-system.html#error-recovery"
+    },
+    {
+      "id": "offline",
+      "name": "Offline Mode",
+      "domain": "patterns",
+      "summary": "The network is a feature the world sometimes turns off. Offline design keeps reading, queues writing, and tells the truth about both.",
+      "anchor": "HIG & Material offline guidance; WCAG 2.2 · 4.1.3; PWA offline-first conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#offline"
+    },
+    {
+      "id": "cancellation",
+      "name": "Cancellation Flow",
+      "domain": "patterns",
+      "summary": "The truest test of a product's ethics: leaving must be as easy as arriving. One path, two screens, zero guilt — the FTC calls it click-to-cancel; this system calls it the default.",
+      "anchor": "FTC Negative Option Rule (click-to-cancel); App Store 3.1.2 / Play subscription cancellation rules; EU Consumer Rights Directive.",
+      "url": "https://edwson.com/consumer-design-system.html#cancellation"
+    },
+    {
+      "id": "search-filter",
+      "name": "Search & Filter",
+      "domain": "patterns",
+      "summary": "Query, refine, count — the loop behind every marketplace. Filters are chips you can see and remove one at a time; the result count updates with every change so cause never loses its effect.",
+      "anchor": "WCAG 2.2 · 4.1.3, 2.5.8; EU DSA Art 27 (ranking transparency); Baymard filtering conventions.",
+      "url": "https://edwson.com/consumer-design-system.html#search-filter"
+    }
+  ],
+  "tokens": {
+    "light": {
+      "--bg": "#fbfbfd",
+      "--surface": "#ffffff",
+      "--surface2": "#f5f5f7",
+      "--surface3": "#ececf0",
+      "--border": "#e8e8ed",
+      "--border2": "#d2d2d7",
+      "--text1": "#1d1d1f",
+      "--text2": "#6e6e73",
+      "--text3": "#a1a1a6",
+      "--accent": "#0a68f5",
+      "--accent-hover": "#0857cf",
+      "--accent-soft": "#eaf2ff",
+      "--accent-fg": "#ffffff",
+      "--green": "#1f9d5b",
+      "--green-soft": "#e8f6ef",
+      "--red": "#e0403a",
+      "--red-soft": "#fdeceb",
+      "--amber": "#c77400",
+      "--amber-soft": "#fdf3e3",
+      "--purple": "#7c5cff",
+      "--purple-soft": "#f1edff",
+      "--glass": "rgba(251, 251, 253, 0.78)",
+      "--glass-border": "rgba(0, 0, 0, 0.08)",
+      "--scrim": "rgba(0, 0, 0, 0.4)",
+      "--shadow-1": "0 1px 2px rgba(0, 0, 0, 0.05)",
+      "--shadow-2": "0 2px 6px rgba(0, 0, 0, 0.05), 0 10px 28px rgba(0, 0, 0, 0.07)",
+      "--shadow-3": "0 8px 20px rgba(0, 0, 0, 0.08), 0 24px 64px rgba(0, 0, 0, 0.12)",
+      "--r-s": "8px",
+      "--r-m": "12px",
+      "--r-l": "18px",
+      "--r-xl": "26px",
+      "--r-pill": "999px",
+      "--spring": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "--dur-1": "160ms",
+      "--dur-2": "280ms",
+      "--dur-3": "480ms",
+      "--sidebar-w": "268px",
+      "--header-h": "60px",
+      "--font": "-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif",
+      "--display": "'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif",
+      "--mono": "'JetBrains Mono', 'SF Mono', ui-monospace, monospace"
+    },
+    "dark": {
+      "--bg": "#000000",
+      "--surface": "#101014",
+      "--surface2": "#1a1a20",
+      "--surface3": "#26262e",
+      "--border": "#26262c",
+      "--border2": "#3a3a42",
+      "--text1": "#f5f5f7",
+      "--text2": "#a1a1a6",
+      "--text3": "#6e6e73",
+      "--accent": "#2f8fff",
+      "--accent-hover": "#5aa5ff",
+      "--accent-soft": "#0f2447",
+      "--accent-fg": "#04060c",
+      "--green": "#30c375",
+      "--green-soft": "#0d2b1c",
+      "--red": "#ff6961",
+      "--red-soft": "#33110f",
+      "--amber": "#f2a33c",
+      "--amber-soft": "#2e2008",
+      "--purple": "#a08cff",
+      "--purple-soft": "#201a3d",
+      "--glass": "rgba(16, 16, 20, 0.72)",
+      "--glass-border": "rgba(255, 255, 255, 0.09)",
+      "--scrim": "rgba(0, 0, 0, 0.6)",
+      "--shadow-1": "0 1px 2px rgba(0, 0, 0, 0.5)",
+      "--shadow-2": "0 2px 6px rgba(0, 0, 0, 0.45), 0 10px 28px rgba(0, 0, 0, 0.5)",
+      "--shadow-3": "0 8px 20px rgba(0, 0, 0, 0.55), 0 24px 64px rgba(0, 0, 0, 0.65)"
+    }
+  },
+  "tokenNotes": {
+    "contrast": "text tokens hold >= 4.5:1 on their surfaces in both themes (WCAG 2.2 AA)",
+    "motion": "--spring is the single house curve; all animation is gated behind prefers-reduced-motion",
+    "usage": "components must reference tokens, never raw hex"
+  }
+}

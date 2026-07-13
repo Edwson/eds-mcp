@@ -37,6 +37,13 @@ try {
   }
 
   console.log('components + discovery');
+  r = await get('/v1/consumer/protocol');
+  ok(r.status === 200 && r.body.agentProtocol && r.body.agentProtocol.length === 7, 'GET /v1/consumer/protocol serves the read path');
+  r = await get('/v1/consumer/components?domain=ai');
+  ok(r.status === 200 && r.body.count >= 20, 'GET /v1/consumer/components?domain=ai lists the agent surfaces');
+  r = await get('/v1/consumer/anchor/COPPA');
+  ok(r.status === 200 && r.body.count >= 1 && r.body.hardRules.length >= 1, 'GET /v1/consumer/anchor/COPPA returns entries + the hard rule');
+
   r = await get('/v1/components');
   ok(r.status === 200 && r.body.count > 0, `GET /v1/components → ${r.body.count}`);
   const id = r.body.components[0].id;

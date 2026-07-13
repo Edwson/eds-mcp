@@ -1,6 +1,6 @@
 {
   "name": "edwson-design-system",
-  "version": "1.16.0",
+  "version": "1.17.0",
   "generator": "build-manifest.js",
   "summary": {
     "tokens": 48,
@@ -87,16 +87,28 @@
       "PortfolioRebalanceProposal",
       "StepUpAuth",
       "ConsentReceipt"
-    ]
+    ],
+    "consumer": {
+      "system": "consumer-design-system",
+      "version": "1.4.0",
+      "components": 118,
+      "domains": 11,
+      "bundles": 7,
+      "hardRules": 7
+    }
   },
   "files": {
     "tokens.json": {
-      "sha256": "83e085d17cb46aa1c77cb6e28ddf4f369de51df852b1f5a126e7838c313bc293",
+      "sha256": "f8b0fde562ea453ac9073282f198c3aeb80e3c5f9cece6561fcbbff9d2f65549",
       "bytes": 2027
     },
     "components.json": {
       "sha256": "32f051f95e7e7f759915de7f36568d4e77de28075273192d965d28f8b4015ccb",
       "bytes": 69754
+    },
+    "consumer.json": {
+      "sha256": "24be24b816501213ab4800dc340591677e22e51e0ae8eebafcb4da9f37a6e5ea",
+      "bytes": 65559
     }
   },
   "sync": {

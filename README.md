@@ -17,8 +17,8 @@ This is the runnable backbone behind the "AI-Native Development" section of the
 [design system showcase](https://edwson.com/design-system-showcase.html).
 
 ```
-MCP: 23 tools · 5 resources · 3 prompts     HTTP: 24 REST endpoints · OpenAPI 3.1     Library: createCore()
-65 component contracts across 14 domains · reads + code-generation + linting + accessibility & compliance audits + flow composition + theme export
+MCP: 29 tools · 5 resources · 3 prompts     HTTP: 29 REST endpoints · OpenAPI 3.1     Library: createCore()
+65 institutional contracts across 14 domains **+ the Consumer Design System pack: 118 B2C categories across 11 domains** · reads + code-generation + linting + accessibility & compliance audits + flow composition + theme export + a machine-carried agent protocol
 ```
 
 > **👉 Fastest way to see what this is _for_: `npm run example`.** One plain-English requirement
@@ -36,7 +36,7 @@ MCP: 23 tools · 5 resources · 3 prompts     HTTP: 24 REST endpoints · OpenAPI
 { "mcpServers": { "eds": { "command": "npx", "args": ["-y", "github:Edwson/eds-mcp"] } } }
 ```
 
-Drop that into your MCP client config and the agent gains all 23 tools. (Once it's on npm:
+Drop that into your MCP client config and the agent gains all 29 tools. (Once it's on npm:
 `"args": ["-y", "eds-mcp-server"]`.)
 
 **② As an HTTP REST API — for any language, any tool, curl, a browser.** Runs with **zero dependencies**:
@@ -85,7 +85,7 @@ makes "which component satisfies FINRA 2111?" a one-call question.
 
 ---
 
-## Tools (23)
+## Tools (29)
 
 Every tool returns a text block **and** `structuredContent` (the same object, machine-parseable);
 failures set `isError: true` instead of masquerading as data.
@@ -137,6 +137,23 @@ failures set `isError: true` instead of masquerading as data.
 | `diff_since {version}` | changed files since a version (auto-sync delta) |
 | `get_method` | the nine non-negotiables + verification gates — the Ed-agent operating contract |
 | `get_stats` | version, component + domain counts, regulatory coverage, token count |
+
+**Consumer Design System pack (the second system, same engine)**
+
+The server also carries a bundled snapshot of the author's [Consumer Design System](https://edwson.com/consumer-design-system.html)
+— 118 B2C component categories across 11 domains (commerce, social, media, onboarding, growth, trust & safety, and a
+22-entry AI & Agents domain), each anchored to a public platform guideline (Apple HIG, Material 3, WCAG 2.2,
+App Store / Play policy, GDPR, COPPA, FTC). The live contracts at `edwson.com/cds/` are canonical; the snapshot makes
+them deterministic offline.
+
+| Tool | Returns |
+|---|---|
+| `list_consumer_components {domain?}` | the B2C catalogue — id, name, domain, anchor, canonical URL |
+| `get_consumer_component {id}` | one entry **with its bundle obligations attached** (paywall arrives owing a cancellation flow) |
+| `search_consumer_components {query}` | keyword search across names, summaries, domains, anchors |
+| `find_consumer_by_anchor {rule}` | regulation-first discovery: "COPPA" → the entries + hard rules that answer to it |
+| `get_consumer_bundles {id?}` | bundled-by-contract pairs — dependencies as data, not tribal knowledge |
+| `get_agent_protocol` | the machine-carried reading logic: seven-step read path + blockable hard rules |
 
 ### Resources (5, whole-file)
 
@@ -277,11 +294,12 @@ Typed (`core.d.ts`), MIT-licensed, SemVer-versioned ([CHANGELOG](./CHANGELOG.md)
 core.js            pure engine — all logic, dependency-free, importable as a library + test-covered
 core.d.ts          TypeScript declarations for the library API
 loadCore.js        builds a ready core from the bundled JSON (shared by server, http, tests)
-server.js          thin MCP adapter — 23 tools + 5 resources + 3 prompts over stdio
-http.js            zero-dependency HTTP REST API — 19 endpoints + OpenAPI 3.1 (node http.js)
+server.js          thin MCP adapter — 29 tools + 5 resources + 3 prompts over stdio
+http.js            zero-dependency HTTP REST API — 29 endpoints + OpenAPI 3.1 (node http.js)
 build-manifest.js  auto-sync engine — hashes contracts -> manifest.json
 tokens.json        token contract (color light/dark, space, radius, type, density)
 components.json    component contracts (purpose, when-to-use/not, props, a11y, regulatory, dataContract)
+consumer.json      the Consumer Design System pack — 118 B2C entries + agentProtocol + bundles + hardRules
 test.js            dependency-free test — contract shape + manifest sync + full engine behaviour
 test-mcp.js        end-to-end integration test — boots the real MCP server, exercises it via the SDK client
 test-http.js       end-to-end integration test — boots the real HTTP API, hits every endpoint

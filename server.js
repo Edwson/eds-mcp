@@ -19,13 +19,14 @@
  * Every tool returns BOTH a text block and `structuredContent`. Failures set
  * `isError: true` rather than masquerading as data.
  *
- * TOOLS (23)
+ * TOOLS (29)
  *   reads:      list_token_groups · get_tokens · get_token · export_theme
  *               list_components · get_component · get_data_contract · get_decision_register
  *               search_components · find_by_regulation · recommend_component · bundle_components
  *   generate:   scaffold_component · lint_usage · scaffold_test
  *   a11y/comply: audit_accessibility · contrast_report · compliance_check · compose_flow
  *   meta:       get_manifest · diff_since · get_method · get_stats
+ *   consumer:   list_consumer_components · get_consumer_component · search_consumer_components · find_consumer_by_anchor · get_consumer_bundles · get_agent_protocol
  * RESOURCES (5) eds://tokens · eds://components · eds://manifest · eds://method · eds://regulatory
  * PROMPTS (3)   build-regulated-component · compliance-review · accessibility-audit
  *
@@ -37,14 +38,15 @@ import { dirname, join } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { createCore } from './core.js';
+import { loadCore } from './loadCore.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const load = (f) => JSON.parse(readFileSync(join(here, f), 'utf8'));
 let manifest = {};
 try { manifest = load('manifest.json'); } catch { /* run build-manifest.js first */ }
 
-const core = createCore({ tokens: load('tokens.json'), components: load('components.json'), manifest });
+// One construction path for server, HTTP API and tests (loadCore) — they can never drift.
+const core = loadCore();
 const VERSION = core.version;
 
 // CLI: respond to --version / --help before opening the stdio transport.
@@ -55,7 +57,7 @@ if (argv.includes('--help') || argv.includes('-h')) {
     `eds-mcp-server v${VERSION} — the Edwson Design System over MCP\n\n` +
     `Usage:\n  node server.js            speak MCP over stdio (default)\n` +
     `  node server.js --version  print version and exit\n  node server.js --help     show this help\n\n` +
-    `23 tools · 5 resources · 3 prompts. Docs: https://github.com/Edwson/eds-mcp\n`);
+    `29 tools · 5 resources · 3 prompts. Docs: https://github.com/Edwson/eds-mcp\n`);
   process.exit(0);
 }
 if (!manifest || !manifest.version) {
@@ -155,6 +157,14 @@ tool('diff_since', { title: 'Diff since version', description: 'Given a consumer
 tool('get_method', { title: 'Get the method', description: 'The Edwson operating contract — the nine non-negotiables + verification gates that every component and scaffold satisfies. The Ed-agent in machine-readable form.', inputSchema: {} }, () => core.getMethod());
 tool('get_stats', { title: 'Get system stats', description: 'System overview: version, component + domain counts, regulatory-framework coverage, token count.', inputSchema: {} }, () => core.getStats());
 
+/* ───────────── CONSUMER PACK (the Consumer Design System — one server, two systems) ───────────── */
+tool('list_consumer_components', { title: 'List consumer components', description: 'The Consumer Design System (B2C sibling, 118 categories / 11 domains incl. a 22-entry AI & Agents domain). List entries — id, name, domain, platform anchor, canonical URL — optionally filtered by domain (e.g. "ai", "commerce", "growth").', inputSchema: { domain: z.string().optional() } }, ({ domain }) => core.listConsumerComponents(domain));
+tool('get_consumer_component', { title: 'Get a consumer component', description: 'One consumer entry with its bundle obligations attached (what it requires, what requires it). The when-not-to cell of the register at `url` is binding.', inputSchema: { id: z.string() } }, ({ id }) => core.getConsumerComponent(id));
+tool('search_consumer_components', { title: 'Search consumer components', description: 'Keyword search across consumer names, summaries, domains and anchors, e.g. "paywall", "child", "cancel".', inputSchema: { query: z.string() } }, ({ query }) => core.searchConsumerComponents(query));
+tool('find_consumer_by_anchor', { title: 'Find consumer components by anchor', description: 'Regulation-first discovery over the consumer catalogue: "COPPA" / "GDPR Art 7" / "FTC" / "WCAG" / "EU AI Act" returns the entries (and hard rules) that answer to it. Start from the rule, not the widget.', inputSchema: { rule: z.string() } }, ({ rule }) => core.findConsumerByAnchor(rule));
+tool('get_consumer_bundles', { title: 'Get consumer bundles', description: 'Bundled-by-contract pairs (paywall→cancellation, UGC→report & block, checkout→order tracking, agent-confirm→agent-trace). All of them, or the obligations of one id — include them unprompted.', inputSchema: { id: z.string().optional() } }, ({ id }) => core.getConsumerBundles(id));
+tool('get_agent_protocol', { title: 'Get the agent protocol', description: 'The consumer system\'s machine-carried reading logic: the seven-step read path (discover → fetch index → select → read register → resolve bundles & hard rules → build from tokens → gate to a human) plus the hard rules that can BLOCK a build.', inputSchema: {} }, () => core.getAgentProtocol());
+
 /* ───────────── RESOURCES (whole-file, read-only) ───────────── */
 if (typeof server.registerResource === 'function') {
   const res = (uri, obj) => ({ contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(obj, null, 2) }] });
@@ -194,4 +204,4 @@ if (typeof server.registerPrompt === 'function') {
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error(`[eds-mcp-server] ready · v${VERSION} · 23 tools · 5 resources · 3 prompts · stdio`);
+console.error(`[eds-mcp-server] ready · v${VERSION} · 29 tools · 5 resources · 3 prompts · stdio`);

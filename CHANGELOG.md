@@ -4,6 +4,30 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.0] — 2026-07-13
+### Added
+- **The Consumer Pack — one server, two design systems** (MCP 23 → 29 tools; HTTP 24 → 29 endpoints).
+  A bundled snapshot of the Consumer Design System (`consumer.json`: 118 B2C component categories across
+  11 domains, each with a platform anchor) now ships alongside the institutional contracts, served by the
+  same pure engine:
+  - `list_consumer_components {domain?}` / `get_consumer_component {id}` / `search_consumer_components {query}`
+  - `find_consumer_by_anchor {rule}` — regulation-first discovery ("COPPA" → entries + hard rules)
+  - `get_consumer_bundles {id?}` — bundled-by-contract pairs (paywall→cancellation, UGC→report & block,
+    agent-confirm→agent-trace); dependencies as data
+  - `get_agent_protocol` — the machine-carried reading logic: the seven-step read path ending at a human
+    gate, plus the hard rules that can BLOCK a build
+  - matching HTTP routes under `/v1/consumer/*`, in the OpenAPI spec
+- `getStats()` reports the consumer pack when loaded; cores built without it degrade gracefully with a hint.
+- Tests: engine coverage in `test.js` (snapshot self-consistency, bundle-id integrity, protocol shape,
+  pack-less degradation) plus wire-level checks in `test-mcp.js` and `test-http.js`.
+
+### Changed
+- `server.js` now constructs its core through `loadCore()` — the same construction path as the HTTP API and
+  the tests, so the three can never drift (previously it loaded the JSON itself).
+- `build-manifest.js` includes `consumer.json` in the checksum manifest and summary.
+- Source of truth note: the live contracts at `https://edwson.com/cds/` are canonical; `consumer.json` is a
+  deterministic offline snapshot — refresh it from the live files, never hand-edit.
+
 ## [1.16.0] — 2026-06-22
 ### Added
 - **Five new capability tools** (MCP 18 → 23; HTTP 19 → 24 endpoints), each over the same pure `core.js`:

@@ -39,6 +39,17 @@ const ROUTES = [
   { method: 'GET',  path: '/v1/diff/{version}',            summary: 'What changed since a consumer’s pinned version.',
     call: (c, x) => core.diffSince(x.params.version) },
 
+  { method: 'GET',  path: '/v1/consumer/components',        summary: 'Consumer Design System: list entries. ?domain= to filter, ?q= to search.',
+    call: (c, x) => x.query.get('q') ? core.searchConsumerComponents(x.query.get('q')) : core.listConsumerComponents(x.query.get('domain') || undefined) },
+  { method: 'GET',  path: '/v1/consumer/components/{id}',   summary: 'One consumer entry with its bundle obligations attached.',
+    call: (c, x) => core.getConsumerComponent(x.params.id) },
+  { method: 'GET',  path: '/v1/consumer/anchor/{rule}',     summary: 'Regulation-first discovery over the consumer catalogue (COPPA, GDPR%20Art%207, FTC, WCAG…).',
+    call: (c, x) => core.findConsumerByAnchor(x.params.rule) },
+  { method: 'GET',  path: '/v1/consumer/bundles',           summary: 'Bundled-by-contract pairs. ?id= for one component’s obligations.',
+    call: (c, x) => core.getConsumerBundles(x.query.get('id') || undefined) },
+  { method: 'GET',  path: '/v1/consumer/protocol',          summary: 'The machine-carried agent reading logic: seven-step read path + blockable hard rules.',
+    call: () => core.getAgentProtocol() },
+
   { method: 'GET',  path: '/v1/tokens',                    summary: 'List token groups (color, space, radius, type, density).',
     call: () => core.listTokenGroups() },
   { method: 'GET',  path: '/v1/tokens/{group}',            summary: 'All tokens in a group. ?theme=light|dark for colour.',
