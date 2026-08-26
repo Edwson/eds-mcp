@@ -4,6 +4,23 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.2] — 2026-08-26
+### Added
+- New `ai-status-orb` consumer component (domain: `ai`) — the Status Orb contract for the
+  `<ai-sphere>` Web Component ([Ai Spheres](https://edwson.com/Ai_Spheres/)): 20 hand-tuned
+  agent motion states (listening, thinking, searching, coding, complete…) as an alternative
+  to a generic spinner. Consumer pack: 142 → 143 entries, `ai` domain 22 → 23. No API changes —
+  `list_consumer_components`, `get_consumer_component`, and `search_consumer_components` all
+  serve the new entry automatically.
+
+## [1.17.1] — 2026-07-14
+### Changed
+- Consumer pack snapshot refreshed to CDS v1.7.0: 118 → 142 entries across 12 domains (social 8 → 14 —
+  profile header, message inbox, polls, mentions/hashtags, live-stream chat, link previews; core → 37 —
+  date picker, upload, multi-step flow, sparkline stat cards, coach marks, address form, appearance
+  switcher, language & region; new Text Animations domain — 10 vanilla motion components with
+  reduced-motion contracts). Counts in README/description updated. No API changes.
+
 ## [1.17.0] — 2026-07-13
 ### Added
 - **The Consumer Pack — one server, two design systems** (MCP 23 → 29 tools; HTTP 24 → 29 endpoints).

@@ -1,6 +1,6 @@
 {
   "name": "consumer-design-system",
-  "version": "1.4.0",
+  "version": "1.7.1",
   "source": {
     "catalogue": "https://edwson.com/consumer-design-system.html",
     "components": "https://edwson.com/cds/components.json",
@@ -8,7 +8,7 @@
     "agentBrief": "https://edwson.com/cds/AGENTS.md",
     "note": "Bundled snapshot for deterministic offline use. The live files above are canonical; refresh this file from them — never hand-edit."
   },
-  "count": 118,
+  "count": 143,
   "domains": [
     "ai",
     "commerce",
@@ -20,20 +20,22 @@
     "onboarding",
     "patterns",
     "social",
+    "text",
     "trust"
   ],
   "counts": {
     "foundations": 7,
-    "core": 29,
+    "core": 37,
     "navigation": 6,
     "onboarding": 8,
     "commerce": 10,
-    "social": 8,
+    "social": 14,
     "media": 6,
     "growth": 7,
     "trust": 8,
-    "ai": 22,
-    "patterns": 7
+    "ai": 23,
+    "patterns": 7,
+    "text": 10
   },
   "agentProtocol": [
     {
@@ -427,6 +429,70 @@
     },
     {
       "id": "upload",
+      "name": "File & Photo Upload",
+      "domain": "core",
+      "summary": "Uploading is the moment a user hands you something they cannot easily replace. Show the file before you take it, show the progress while you take it, and let them take it back.",
+      "anchor": "WCAG 2.2 · 4.1.3 status messages, 3.3.1 error identification; HIG Photos & camera access; App Store Review 5.1.1 (purpose strings); GDPR Art. 5(1)(c) data minimisation — location EXIF is personal data.",
+      "url": "https://edwson.com/consumer-design-system.html#upload"
+    },
+    {
+      "id": "wizard",
+      "name": "Multi-Step Flow",
+      "domain": "core",
+      "summary": "Long forms survive by lying about their length — honestly. Chunk by topic, show where you are, and make Back free: nothing typed is ever lost to navigation.",
+      "anchor": "WCAG 2.2 · 3.3.7 redundant entry, 2.4.3 focus order; checkout-flow conventions (Baymard).",
+      "url": "https://edwson.com/consumer-design-system.html#wizard"
+    },
+    {
+      "id": "stat-card",
+      "name": "Stats & Sparkline Card",
+      "domain": "core",
+      "summary": "Consumer analytics — screen time, spending, steps — is one number, one direction, one tiny chart. The card answers \"how am I doing\" before the eye finishes landing on it.",
+      "anchor": "WCAG 2.2 · 1.4.1, 1.1.1; chart-honesty conventions (labelled ranges, honest baselines).",
+      "url": "https://edwson.com/consumer-design-system.html#stat-card"
+    },
+    {
+      "id": "coach-mark",
+      "name": "Coach Marks & Tips",
+      "domain": "core",
+      "summary": "Teaching without a classroom: one anchored tip, at the moment of relevance, dismissed forever with one tap. The feature tour that respects that nobody wants a tour.",
+      "anchor": "HIG onboarding (teach in context); Material feature-discovery guidance; WCAG 2.2 · 1.4.13.",
+      "url": "https://edwson.com/consumer-design-system.html#coach-mark"
+    },
+    {
+      "id": "address-form",
+      "name": "Address Form",
+      "domain": "core",
+      "summary": "The most abandoned form in commerce, and the most international. One search field does most of the work; the rest adapts to the country instead of arguing with it.",
+      "anchor": "WCAG 2.2 · 1.3.5 identify input purpose, 3.3.7; postal-format conventions (UPU); Baymard address research.",
+      "url": "https://edwson.com/consumer-design-system.html#address-form"
+    },
+    {
+      "id": "appearance",
+      "name": "Appearance Switcher",
+      "domain": "core",
+      "summary": "Light, dark, or follow the system — with the system as the default, because the user already told their OS what they want and asking twice is a bug.",
+      "anchor": "HIG dark mode; Material color schemes; WCAG 2.2 · 1.4.3 (both themes), prefers-color-scheme.",
+      "url": "https://edwson.com/consumer-design-system.html#appearance"
+    },
+    {
+      "id": "language",
+      "name": "Language & Region",
+      "domain": "core",
+      "summary": "Every language names itself in itself — 日本語, not \"Japanese\" — because the person who needs the switch is precisely the one who can't read your current language.",
+      "anchor": "WCAG 2.2 · 3.1.2 language of parts; BCP 47; HIG internationalization; W3C i18n best practices.",
+      "url": "https://edwson.com/consumer-design-system.html#language"
+    },
+    {
+      "id": "datepicker",
+      "name": "Date & Time Picker",
+      "domain": "core",
+      "summary": "The control people fight with most, because it is the one place a product insists on its own format instead of accepting yours. Take typing. Take pasting. Take “next Friday” if you can.",
+      "anchor": "WAI-ARIA Authoring Practices · Date Picker Dialog; WCAG 2.2 · 2.1.1 keyboard, 3.3.2 labels or instructions; HIG Pickers; Material 3 Date pickers.",
+      "url": "https://edwson.com/consumer-design-system.html#datepicker"
+    },
+    {
+      "id": "upload",
       "name": "Upload & Camera",
       "domain": "core",
       "summary": "Uploading is the moment a user hands you something they cannot easily replace. Show the file before you take it, show the progress while you take it, and let them take it back.",
@@ -704,6 +770,54 @@
       "summary": "A gradient halo that means \"new, and it expires.\" The seen state — gray, quiet — is just as much the design as the rainbow.",
       "anchor": "WCAG 2.2 · 1.4.1, 2.1.1; ephemeral-content honesty conventions.",
       "url": "https://edwson.com/consumer-design-system.html#story"
+    },
+    {
+      "id": "profile-header",
+      "name": "Profile Header",
+      "domain": "social",
+      "summary": "A person's front door: identity above the fold, numbers that mean something, one primary action. Everything else on the profile is furniture — this is the handshake.",
+      "anchor": "WCAG 2.2 · 1.3.1 headings, 2.4.4 link purpose; EU DSA Art 30 (trader identity where accounts sell); verified-badge conventions (see Trust & Safety).",
+      "url": "https://edwson.com/consumer-design-system.html#profile-header"
+    },
+    {
+      "id": "dm-inbox",
+      "name": "Message Inbox",
+      "domain": "social",
+      "summary": "The conversation list is triage, not archaeology: who, the last line, how long ago, and whether it needs you — readable in a glance per row. Strangers wait in Requests, not in your face.",
+      "anchor": "WCAG 2.2 · 2.5.7 dragging movements, 1.4.1; ePrivacy (unsolicited messaging consent); platform anti-spam norms.",
+      "url": "https://edwson.com/consumer-design-system.html#dm-inbox"
+    },
+    {
+      "id": "poll",
+      "name": "Poll & Voting",
+      "domain": "social",
+      "summary": "The lightest form of speech. One tap to vote, results the moment you have — and never the moment before, because seeing the crowd first changes the answer.",
+      "anchor": "WCAG 2.2 · 1.4.1, 4.1.3; research-method honesty (no result-peeking bias); EU DSA Art 25.",
+      "url": "https://edwson.com/consumer-design-system.html#poll"
+    },
+    {
+      "id": "mention-tag",
+      "name": "Mentions & Hashtags",
+      "domain": "social",
+      "summary": "The wiring of the social graph: @ points at a person, # points at a room. Both are entities the moment they're typed — colored, linked, and accountable.",
+      "anchor": "WAI-ARIA combobox pattern; WCAG 2.2 · 1.4.1; EU DSA (notice mechanisms extend to tags of people).",
+      "url": "https://edwson.com/consumer-design-system.html#mention-tag"
+    },
+    {
+      "id": "live-chat",
+      "name": "Live Stream Chat",
+      "domain": "social",
+      "summary": "Thousands of voices in a phone-width column. The design job is legibility under flood: pinned context stays put, moderation is one tap, and the flow never steals your scroll position.",
+      "anchor": "WCAG 2.2 · 4.1.3 (throttled announcements), 2.2.2; EU DSA Art 16 (report adjacency); App Store 1.2 (UGC moderation).",
+      "url": "https://edwson.com/consumer-design-system.html#live-chat"
+    },
+    {
+      "id": "link-preview",
+      "name": "Link Preview Card",
+      "domain": "social",
+      "summary": "The unfurled URL: image, title, domain. Its one non-negotiable job is telling the truth about where a tap will take you — the domain is the security surface, not a caption.",
+      "anchor": "Open Graph conventions; FTC deception standard (misleading destinations); WCAG 2.2 · 2.4.4.",
+      "url": "https://edwson.com/consumer-design-system.html#link-preview"
     },
     {
       "id": "video",
@@ -1050,6 +1164,14 @@
       "url": "https://edwson.com/consumer-design-system.html#ai-onboarding"
     },
     {
+      "id": "ai-status-orb",
+      "name": "Status Orb",
+      "domain": "ai",
+      "summary": "A spinner has one state: “working.” An agent has many — listening, thinking, searching, writing code, done — and telling them apart is the difference between a user who waits and a user who understands why. The orb encodes agent state as motion, not just presence.",
+      "anchor": "WCAG 2.2 · 2.3.3 animation from interactions, 1.4.1 use of colour (state is not colour-only — pair with the status text); prefers-reduced-motion freezes the current frame rather than hiding the element; ARIA role=img with a state-derived accessible name kept in sync via aria-live status text.",
+      "url": "https://edwson.com/consumer-design-system.html#sec-ai-status-orb"
+    },
+    {
       "id": "pull-refresh",
       "name": "Pull to Refresh",
       "domain": "patterns",
@@ -1104,6 +1226,86 @@
       "summary": "Query, refine, count — the loop behind every marketplace. Filters are chips you can see and remove one at a time; the result count updates with every change so cause never loses its effect.",
       "anchor": "WCAG 2.2 · 4.1.3, 2.5.8; EU DSA Art 27 (ranking transparency); Baymard filtering conventions.",
       "url": "https://edwson.com/consumer-design-system.html#search-filter"
+    },
+    {
+      "id": "text-split",
+      "name": "Split Reveal",
+      "domain": "text",
+      "summary": "The headline arrives one character at a time — a stagger so short it reads as texture, not theatre. The workhorse entrance for hero copy.",
+      "anchor": "WCAG 2.2 · 2.3.3 animation from interactions; Core Web Vitals CLS discipline; HIG Motion (purposeful, brief).",
+      "url": "https://edwson.com/consumer-design-system.html#text-split"
+    },
+    {
+      "id": "text-blur",
+      "name": "Blur In",
+      "domain": "text",
+      "summary": "Words resolve from soft focus to sharp, like the eye settling. The gentlest entrance in the set — calm products earn it.",
+      "anchor": "WCAG 2.2 · 2.3.3; vestibular-safe motion guidance (filter over transform); HIG Motion.",
+      "url": "https://edwson.com/consumer-design-system.html#text-blur"
+    },
+    {
+      "id": "text-typewriter",
+      "name": "Typewriter",
+      "domain": "text",
+      "summary": "Text that appears to be written, caret and all. Fifty years old and still the most honest way to say \"something is composing this.\"",
+      "anchor": "WCAG 2.2 · 2.2.2 (nothing blinks indefinitely), 2.3.3; EU AI Act Art 50 adjacency (composition theatre must be truthful).",
+      "url": "https://edwson.com/consumer-design-system.html#text-typewriter"
+    },
+    {
+      "id": "text-decode",
+      "name": "Decode",
+      "domain": "text",
+      "summary": "Characters churn through noise and settle into the message, left to right. The cyberpunk entrance — loud, memorable, and strictly rationed.",
+      "anchor": "WCAG 2.2 · 2.3.3, 4.1.3 (announce once, final only); Core Web Vitals CLS.",
+      "url": "https://edwson.com/consumer-design-system.html#text-decode"
+    },
+    {
+      "id": "text-count",
+      "name": "Count Up",
+      "domain": "text",
+      "summary": "Numbers that travel to their value. Movement says \"this was measured, watch it arrive\" — which is exactly why it may only ever land on the true figure.",
+      "anchor": "WCAG 2.2 · 2.3.3, 4.1.3; FTC substantiation discipline (motion is emphasis — emphasised claims need evidence).",
+      "url": "https://edwson.com/consumer-design-system.html#text-count"
+    },
+    {
+      "id": "text-rotate",
+      "name": "Word Rotate",
+      "domain": "text",
+      "summary": "One slot in the sentence cycles through alternatives — \"built for runners / riders / climbers\". The rotation makes a list feel like a welcome.",
+      "anchor": "WCAG 2.2 · 2.2.2 pause/stop/hide (self-stopping), 2.3.3; FTC (rotating claims are still claims).",
+      "url": "https://edwson.com/consumer-design-system.html#text-rotate"
+    },
+    {
+      "id": "text-gradient",
+      "name": "Gradient Flow",
+      "domain": "text",
+      "summary": "A slow aurora inside the letterforms. Color moves so the type doesn't have to — the quietest way to make one line feel alive.",
+      "anchor": "WCAG 2.2 · 1.4.3 (every stop passes), 2.3.3; HIG color (decorative color never carries meaning).",
+      "url": "https://edwson.com/consumer-design-system.html#text-gradient"
+    },
+    {
+      "id": "text-shine",
+      "name": "Shine Sweep",
+      "domain": "text",
+      "summary": "A highlight passes across the word once, like light across brushed metal. The premium accent — and like all premium things, scarce by design.",
+      "anchor": "WCAG 2.2 · 1.4.3 (base state passes alone), 2.3.3; EU DSA Art 25 (no shimmer-as-urgency).",
+      "url": "https://edwson.com/consumer-design-system.html#text-shine"
+    },
+    {
+      "id": "text-wave",
+      "name": "Wave",
+      "domain": "text",
+      "summary": "Characters take turns bouncing — playful energy for playful products. The party trick of the set, which is precisely why it self-stops.",
+      "anchor": "WCAG 2.2 · 2.2.2 (self-stopping), 2.3.3; UK Age Appropriate Design Code adjacency (kid surfaces avoid compulsive motion).",
+      "url": "https://edwson.com/consumer-design-system.html#text-wave"
+    },
+    {
+      "id": "text-marquee",
+      "name": "Marquee Ticker",
+      "domain": "text",
+      "summary": "The infinite ribbon — logos, headlines, drop announcements. The only permanently moving text this system allows, and it pays for the privilege with a real pause control.",
+      "anchor": "WCAG 2.2 · 2.2.2 pause/stop/hide (the letter of it), 2.3.3; HIG Motion.",
+      "url": "https://edwson.com/consumer-design-system.html#text-marquee"
     }
   ],
   "tokens": {

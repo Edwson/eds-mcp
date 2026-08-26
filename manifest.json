@@ -1,6 +1,6 @@
 {
   "name": "edwson-design-system",
-  "version": "1.17.0",
+  "version": "1.17.1",
   "generator": "build-manifest.js",
   "summary": {
     "tokens": 48,
@@ -90,16 +90,16 @@
     ],
     "consumer": {
       "system": "consumer-design-system",
-      "version": "1.4.0",
-      "components": 118,
-      "domains": 11,
+      "version": "1.7.1",
+      "components": 143,
+      "domains": 12,
       "bundles": 7,
       "hardRules": 7
     }
   },
   "files": {
     "tokens.json": {
-      "sha256": "f8b0fde562ea453ac9073282f198c3aeb80e3c5f9cece6561fcbbff9d2f65549",
+      "sha256": "89ca2048a9484873d6ccaf670bceabc3b12a8f112cd446e17232464499b8abf7",
       "bytes": 2027
     },
     "components.json": {
@@ -107,8 +107,8 @@
       "bytes": 69754
     },
     "consumer.json": {
-      "sha256": "24be24b816501213ab4800dc340591677e22e51e0ae8eebafcb4da9f37a6e5ea",
-      "bytes": 65559
+      "sha256": "89885f6d867cde38113c167af591bce630f551f1669ff5582dd142f659d59d75",
+      "bytes": 77731
     }
   },
   "sync": {
